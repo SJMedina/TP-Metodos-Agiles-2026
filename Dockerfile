@@ -1,14 +1,21 @@
-# Usamos una imagen de Java 21 (LTS)
-FROM eclipse-temurin:21-jdk-alpine
+FROM maven:3.9.9-eclipse-temurin-17 AS build
 
-# Directorio de trabajo dentro del contenedor
+WORKDIR /workspace
+
+COPY pom.xml .
+COPY .mvn .mvn
+COPY mvnw .
+RUN chmod +x mvnw
+
+COPY src src
+RUN ./mvnw -q -DskipTests package
+
+FROM eclipse-temurin:17-jre
+
 WORKDIR /app
 
-# Copiamos el archivo JAR (asegurate de haber corrido ./mvnw package antes)
-COPY target/*.jar app.jar
+COPY --from=build /workspace/target/*.jar app.jar
 
-# Exponemos el puerto de Spring Boot
 EXPOSE 8080
 
-# Comando para ejecutar la app
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
