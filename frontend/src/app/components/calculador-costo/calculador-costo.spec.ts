@@ -1,22 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+// Acá estaba el error: importamos correctamente CalculadorCostoComponent
+import { CalculadorCostoComponent } from './calculador-costo'; 
 
-import { CalculadorCosto } from './calculador-costo';
-
-describe('CalculadorCosto', () => {
-  let component: CalculadorCosto;
-  let fixture: ComponentFixture<CalculadorCosto>;
+describe('CalculadorCostoComponent', () => {
+  let component: CalculadorCostoComponent;
+  let fixture: ComponentFixture<CalculadorCostoComponent>;
 
   beforeEach(async () => {
+    // Como es un componente Standalone, lo ponemos en imports
     await TestBed.configureTestingModule({
-      imports: [CalculadorCosto],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(CalculadorCosto);
+      imports: [CalculadorCostoComponent] 
+    })
+    .compileComponents();
+    
+    fixture = TestBed.createComponent(CalculadorCostoComponent);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('debería crearse correctamente', () => {
     expect(component).toBeTruthy();
   });
 });

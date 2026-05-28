@@ -1,20 +1,24 @@
 ﻿import { TestBed } from '@angular/core/testing';
 import { App } from './app';
+
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
     }).compileComponents();
   });
-  it('should create the app', () => {
+
+  it('debería crearse la aplicación correctamente', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
   });
-  it('should render the title', async () => {
+
+  it(`debería tener el título 'TP-Metodos-Agiles-2026'`, () => {
     const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('TP-Metodos-Agiles-2026');
+    const app = fixture.componentInstance;
+    
+    // Al castear 'app' como 'any', TypeScript nos deja acceder a propiedades protected o private
+    expect((app as any).title()).toEqual('TP-Metodos-Agiles-2026');
   });
 });
