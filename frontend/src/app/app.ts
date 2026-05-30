@@ -1,12 +1,12 @@
 import { Component, signal } from '@angular/core';
-import { CalculadorCostoComponent } from './components/calculador-costo/calculador-costo'; // Importamos tu componente
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CalculadorCostoComponent], 
+  imports: [RouterOutlet],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css']
 })
 export class App {
   protected readonly title = signal('TP-Metodos-Agiles-2026');

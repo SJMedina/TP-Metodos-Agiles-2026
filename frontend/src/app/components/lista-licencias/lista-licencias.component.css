@@ -1,0 +1,111 @@
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+  color: #064e3b;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 20px;
+  background: #ecfdf5;
+  border: 1px solid #d1fae5;
+  border-radius: 18px;
+  padding: 22px;
+}
+
+.page-header h1 {
+  margin: 0 0 8px;
+  color: #064e3b;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.8rem;
+  color: #065f46;
+}
+
+.subtitle {
+  margin: 0;
+  color: #134e4a;
+}
+
+.primary-button {
+  border: none;
+  border-radius: 14px;
+  padding: 14px 22px;
+  color: white;
+  background: #16a34a;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background: #15803d;
+}
+
+.license-list {
+  background: #ffffff;
+  border: 1px solid #d1fae5;
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.license-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.license-table thead {
+  background: #ecfccb;
+}
+
+.license-table th,
+.license-table td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e2f0db;
+}
+
+.license-table th {
+  color: #065f46;
+  font-weight: 700;
+}
+
+.license-table tbody tr:hover {
+  background: #f0fdf4;
+}
+
+.empty-state {
+  padding: 28px;
+  background: #f0fdf4;
+  color: #134e4a;
+  border-radius: 14px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.message {
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.message.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.loading {
+  padding: 32px;
+  text-align: center;
+  color: #059669;
+  font-size: 16px;
+}

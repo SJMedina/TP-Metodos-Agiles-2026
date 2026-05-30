@@ -2,8 +2,8 @@
   display: block;
   min-height: 100dvh;
   font-family: Arial, Helvetica, sans-serif;
-  background: #0f172a;
-  color: #e2e8f0;
+  background: #ecfdf5;
+  color: #064e3b;
 }
 .shell {
   min-height: 100dvh;
@@ -12,28 +12,52 @@
   padding: 24px;
 }
 .card {
-  width: min(720px, 100%);
-  background: rgba(15, 23, 42, 0.92);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 20px;
+  width: min(960px, 100%);
+  background: #ffffff;
+  border: 1px solid #d1fae5;
+  border-radius: 24px;
   padding: 32px;
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.35);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+}
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 28px;
+  padding: 20px;
+  border-radius: 20px;
+  background: #dcfce7;
+}
+.top-bar nav {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.top-bar a {
+  color: #065f46;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #ecfdf5;
+}
+.top-bar a:hover {
+  background: #d9f99d;
 }
 .eyebrow {
   margin: 0 0 12px;
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: #15803d;
 }
 h1 {
   margin: 0;
   font-size: clamp(2rem, 4vw, 3rem);
 }
-.lead {
-  margin: 12px 0 0;
-  color: #cbd5e1;
-  line-height: 1.6;
+.content {
+  display: block;
 }
 .grid {
   display: grid;
@@ -42,19 +66,19 @@ h1 {
   margin-top: 28px;
 }
 article {
-  background: rgba(30, 41, 59, 0.8);
+  background: #f0fdf4;
   border-radius: 16px;
   padding: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.15);
+  border: 1px solid #bbf7d0;
 }
 span {
   display: block;
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: #165e53;
   margin-bottom: 8px;
 }
 strong {
   font-size: 1rem;
-  color: #f8fafc;
+  color: #064e3b;
   word-break: break-word;
 }

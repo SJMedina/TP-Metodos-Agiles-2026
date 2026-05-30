@@ -32,6 +32,15 @@ public class LicenciaCostoService {
                     case 1 -> 23.0; 
                     default -> throw new IllegalArgumentException("Vigencia no válida");
                 };
+            case "F":
+            case "G":
+                return switch (vigencia) {
+                    case 5 -> 40.0;
+                    case 4 -> 30.0;
+                    case 3 -> 25.0;
+                    case 1 -> 20.0;
+                    default -> throw new IllegalArgumentException("Vigencia no válida");
+                };
             case "D":
                 return switch (vigencia) {
                     case 5 -> 59.0; 
