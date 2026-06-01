@@ -14,8 +14,8 @@ interface LoginResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  //private api = '/auth';
-  private api = 'http://localhost:8080/auth';
+  private api = '/auth';
+  //private api = 'http://localhost:8080/auth';
   private authSubject = new BehaviorSubject<LoginResponse | null>(null);
   public auth$ = this.authSubject.asObservable();
   private platformId = inject(PLATFORM_ID);

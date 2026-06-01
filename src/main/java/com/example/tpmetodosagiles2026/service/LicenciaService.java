@@ -252,4 +252,10 @@ public class LicenciaService {
     public List<Licencia> listarPorDocumento(String numeroDocumento) {
         return repository.findByNumeroDocumento(numeroDocumento);
     }
+
+    public Licencia buscarPorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Licencia no encontrada con ID: " + id));
+    }
+
 }

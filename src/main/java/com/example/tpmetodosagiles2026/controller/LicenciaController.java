@@ -21,6 +21,7 @@ import com.example.tpmetodosagiles2026.dto.EmitirLicenciaDTO;
 import com.example.tpmetodosagiles2026.dto.RenovarLicenciaDTO;
 import com.example.tpmetodosagiles2026.model.Licencia;
 import com.example.tpmetodosagiles2026.service.LicenciaService;
+import com.example.tpmetodosagiles2026.service.PdfService;
 
 @RestController
 @RequestMapping("/api/licencias")
@@ -29,9 +30,13 @@ public class LicenciaController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LicenciaController.class);
     private final LicenciaService service;
+    private final PdfService pdfService;
 
-    public LicenciaController(LicenciaService service) {
+
+
+    public LicenciaController(LicenciaService service, PdfService pdfService) {
         this.service = service;
+        this.pdfService = pdfService;
     }
 
     @PostMapping
@@ -92,5 +97,15 @@ public class LicenciaController {
         return ResponseEntity.ok(licencia);
     }
 
+    @GetMapping(value = "/{id}/imprimir", produces = "application/zip")
+    public ResponseEntity<byte[]> imprimirLicencia(@PathVariable Long id) {
+        byte[] zipBytes = pdfService.generarZipImpresion(id);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=\"tramite_licencia_" + id +".zip\"")
+                .body(zipBytes);
+    }
+
 
 }
+
