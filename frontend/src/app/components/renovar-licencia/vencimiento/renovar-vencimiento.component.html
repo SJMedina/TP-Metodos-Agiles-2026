@@ -1,0 +1,67 @@
+<div class="page">
+    <div class="header-row">
+        <div>
+            <h1>Renovar por Vencimiento</h1>
+            <p>Busque la licencia por número de documento y seleccione cuál renovar.</p>
+            <p class="info">Usuario administrativo: {{ currentUser || 'No hay sesión activa' }}</p>
+        </div>
+        <button class="secondary-button" routerLink="/renovar-licencia">Volver</button>
+    </div>
+
+    <div class="form-card">
+
+        <!-- Búsqueda -->
+        <label for="documento">Número de documento</label>
+        <div style="display: flex; gap: 1rem;">
+            <input id="documento" [(ngModel)]="documento" placeholder="Ingrese el documento" style="flex:1"/>
+            <button class="primary-button" (click)="buscarPorDocumento()">Buscar</button>
+        </div>
+
+        <!-- Lista de licencias encontradas -->
+        <div *ngIf="buscado && licencias.length > 0" style="margin-top: 1.5rem;">
+            <label>Seleccione una licencia:</label>
+            <div *ngFor="let lic of licencias" class="form-card"
+                style="cursor: pointer; margin-top: 0.75rem; border: 2px solid transparent;"
+                [style.border-color]="licenciaSeleccionada?.id === lic.id ? 'var(--primary)' : 'transparent'"
+                (click)="seleccionarLicencia(lic)">
+                <p><strong>Titular:</strong> {{ lic.titular }}</p>
+                <p><strong>Clase:</strong> {{ lic.clase }}</p>
+                <p><strong>Vence:</strong> {{ getFechaVencimiento(lic) | date:'dd/MM/yyyy' }}</p>
+                <p *ngIf="!estaEnVentanaRenovacion(lic)" style="color: red;">
+                    ⚠️ Fuera del período de renovación
+                </p>
+                <p *ngIf="estaEnVentanaRenovacion(lic)" style="color: green;">
+                    ✅ Habilitada para renovar
+                </p>
+            </div>
+        </div>
+
+        <!-- Acciones, solo si hay licencia seleccionada habilitada -->
+        <div *ngIf="licenciaSeleccionada && estaEnVentanaRenovacion(licenciaSeleccionada)" style="margin-top: 1.5rem;">
+            <p>Vigencia que corresponde según edad: <strong>{{ vigenciaCalculada }} año/s</strong></p>
+
+            <div class="actions">
+                <button class="primary-button" (click)="renovar()">Renovar licencia</button>
+                <button class="secondary-button" (click)="toggleCalculador()">
+                    {{ mostrandoCalculador ? 'Cerrar cálculo' : 'Calcular costo' }}
+                </button>
+            </div>
+        </div>
+
+        <div *ngIf="costoCalculado !== null" class="message info">
+            Costo seleccionado: ${{ costoCalculado }}
+        </div>
+        <div *ngIf="errorValidacion" class="message error">{{ errorValidacion }}</div>
+        <div *ngIf="mensaje" class="message success">{{ mensaje }}</div>
+    </div>
+
+    <!-- Modal calculador -->
+    <div *ngIf="mostrandoCalculador" class="modal-overlay">
+        <div class="modal-card">
+            <button class="modal-close" (click)="cerrarCalculador()">×</button>
+            <app-calculador-costo [claseBase]="licenciaSeleccionada?.clase ?? ''" [vigenciaFija]="vigenciaCalculada"
+                (costoEmitido)="handleCostoCalculado($event)">
+            </app-calculador-costo>
+        </div>
+    </div>
+</div>

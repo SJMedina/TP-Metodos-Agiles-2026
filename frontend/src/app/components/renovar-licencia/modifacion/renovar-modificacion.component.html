@@ -1,0 +1,63 @@
+<div class="page">
+  <div class="header-row">
+    <div>
+      <h1>Renovar por Modificación de Datos</h1>
+      <p>Busque la licencia y edite los datos que necesita actualizar.</p>
+      <p class="info">Usuario administrativo: {{ currentUser || 'No hay sesión activa' }}</p>
+    </div>
+    <button class="secondary-button" routerLink="/renovar-licencia">Volver</button>
+  </div>
+
+  <!-- Búsqueda -->
+  <div class="form-card">
+    <label for="documento">Número de documento</label>
+    <div style="display: flex; gap: 1rem;">
+      <input id="documento" [(ngModel)]="documento" placeholder="Ingrese el documento" style="flex:1" />
+      <button class="primary-button" (click)="buscarPorDocumento()">Buscar</button>
+    </div>
+
+    <!-- Lista de licencias encontradas -->
+    <div *ngIf="buscado && licencias.length > 0 && !licenciaEditable" style="margin-top: 1.5rem;">
+      <label>Seleccione una licencia para editar:</label>
+      <div *ngFor="let lic of licencias"
+           class="form-card"
+           style="cursor: pointer; margin-top: 0.75rem;"
+           (click)="seleccionarLicencia(lic)">
+        <p><strong>Titular:</strong> {{ lic.titular }}</p>
+        <p><strong>Clase:</strong> {{ lic.clase }}</p>
+        <p><strong>Documento:</strong> {{ lic.numeroDocumento }}</p>
+      </div>
+    </div>
+
+    <!-- Formulario de edición -->
+    <div *ngIf="licenciaEditable" style="margin-top: 1.5rem;">
+      <label for="titular">Titular</label>
+      <input id="titular" [(ngModel)]="licenciaEditable.titular" placeholder="Nombre completo" />
+
+      <label for="fechaNacimiento">Fecha de nacimiento</label>
+      <input id="fechaNacimiento" type="date" [(ngModel)]="licenciaEditable.fechaNacimiento" />
+
+      <label for="edad">Edad</label>
+      <input id="edad" type="number" [value]="calcularEdad(licenciaEditable.fechaNacimiento)" readonly />
+
+      <label for="observaciones">Observaciones / Limitaciones</label>
+      <textarea id="observaciones" [(ngModel)]="licenciaEditable.observaciones"
+                placeholder="Observaciones" rows="3"></textarea>
+
+      <!-- Campos no editables -->
+      <label>Clase (no modificable)</label>
+      <input [value]="licenciaEditable.clase" readonly style="background: var(--surface-2); color: var(--text-muted)" />
+
+      <label>Documento (no modificable)</label>
+      <input [value]="licenciaEditable.numeroDocumento" readonly style="background: var(--surface-2); color: var(--text-muted)" />
+
+      <div class="actions">
+        <button class="primary-button" (click)="guardar()">Guardar cambios</button>
+        <button class="secondary-button" (click)="licenciaEditable = null">Cancelar</button>
+      </div>
+    </div>
+
+    <div *ngIf="errorValidacion" class="message error">{{ errorValidacion }}</div>
+    <div *ngIf="mensaje" class="message success">{{ mensaje }}</div>
+  </div>
+</div>

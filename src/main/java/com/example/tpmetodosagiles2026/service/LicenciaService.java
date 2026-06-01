@@ -1,9 +1,10 @@
 package com.example.tpmetodosagiles2026.service;
 
-import com.example.tpmetodosagiles2026.dto.EmitirLicenciaDTO;
-import com.example.tpmetodosagiles2026.model.Licencia;
-import com.example.tpmetodosagiles2026.repository.LicenciaRepository;
-import com.example.tpmetodosagiles2026.service.LicenciaCostoService;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -11,10 +12,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.util.List;
+import com.example.tpmetodosagiles2026.dto.EmitirLicenciaDTO;
+import com.example.tpmetodosagiles2026.dto.RenovarLicenciaDTO;
+import com.example.tpmetodosagiles2026.model.Licencia;
+import com.example.tpmetodosagiles2026.repository.LicenciaRepository;
 
 @Service
 public class LicenciaService {
@@ -50,12 +51,83 @@ public class LicenciaService {
         licencia.setFechaEmision(LocalDateTime.now());
         licencia.setUsuarioAdministrativo(obtenerUsuarioActual());
 
-        LOGGER.info("Persisting licencia for documento={} clase={} usuario={}", dto.getNumeroDocumento(), dto.getClase(), licencia.getUsuarioAdministrativo());
+        LOGGER.info("Persisting licencia for documento={} clase={} usuario={}", dto.getNumeroDocumento(),
+                dto.getClase(), licencia.getUsuarioAdministrativo());
         Licencia saved = repository.save(licencia);
         repository.flush();
-        LOGGER.info("Licencia persistida con id={} documento={} clase={}", saved.getId(), saved.getNumeroDocumento(), saved.getClase());
+        LOGGER.info("Licencia persistida con id={} documento={} clase={}", saved.getId(), saved.getNumeroDocumento(),
+                saved.getClase());
         return saved;
     }
+
+    @Transactional
+    public Licencia renovar(RenovarLicenciaDTO dto) {
+        Licencia licencia = repository.findById(dto.getId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No existe una licencia con id=" + dto.getId()));
+
+        validarVigenciaRenovacion(dto.getVigencia());
+
+        boolean esPorVencimiento = Boolean.TRUE.equals(dto.getRenovarPorVencimiento());
+
+        if (esPorVencimiento) {
+            validarVentanaRenovacion(licencia);
+        }
+
+        if (dto.getTitular() != null)
+            licencia.setTitular(dto.getTitular().trim());
+        if (dto.getEdad() != null)
+            licencia.setEdad(dto.getEdad());
+        if (dto.getFechaNacimiento() != null)
+            licencia.setFechaNacimiento(dto.getFechaNacimiento());
+        if (dto.getObservaciones() != null)
+            licencia.setObservaciones(dto.getObservaciones().trim());
+
+        licencia.setVigencia(dto.getVigencia());
+        licencia.setFechaEmision(LocalDateTime.now());
+        licencia.setUsuarioAdministrativo(obtenerUsuarioActual());
+
+        double costo = costoService.calcularCostoTotal(licencia.getClase(), dto.getVigencia());
+        licencia.setCosto(costo);
+
+        LOGGER.info("Renovando licencia id={} tipo={}", licencia.getId(),
+                esPorVencimiento ? "VENCIMIENTO" : "MODIFICACION_DATOS");
+
+        Licencia saved = repository.save(licencia);
+        repository.flush();
+        LOGGER.info("Licencia renovada id={}", saved.getId());
+        return saved;
+    }
+
+    private void validarVigenciaRenovacion(Integer vigencia) {
+        if (vigencia == null) {
+            throw new IllegalArgumentException("La vigencia es obligatoria para la renovacion");
+        }
+        if (vigencia != 1 && vigencia != 3 && vigencia != 4 && vigencia != 5) {
+            throw new IllegalArgumentException("La vigencia debe ser 1, 3, 4 o 5 anos");
+        }
+    }
+
+    private void validarVentanaRenovacion(Licencia licencia) {
+
+        LocalDate fechaVencimiento = licencia.getFechaEmision()
+                .toLocalDate()
+                .plusYears(licencia.getVigencia());
+
+        LocalDate hoy = LocalDate.now();
+        LocalDate unMesAntes = fechaVencimiento.minusMonths(1);
+        LocalDate seisMesesAntes = fechaVencimiento.minusMonths(6);
+
+        // Debe estar entre 6 meses y 1 mes antes del vencimiento
+        if (hoy.isBefore(seisMesesAntes) || hoy.isAfter(unMesAntes)) {
+            throw new IllegalArgumentException(
+                    "La licencia solo puede renovarse por vencimiento entre 6 y 1 mes antes de su fecha de vencimiento. "
+                            +
+                            "Vence: " + fechaVencimiento);
+        }
+    }
+
+    
 
     public long contarLicencias() {
         return repository.count();
@@ -126,43 +198,38 @@ public class LicenciaService {
     private void validarClaseProfesional(EmitirLicenciaDTO dto, Integer edad) {
         if (edad < 21) {
             throw new IllegalArgumentException(
-                "Para obtener licencia de clase " + dto.getClase() +
-                " debe tener minimo 21 anos (edad actual: " + edad + ")"
-            );
+                    "Para obtener licencia de clase " + dto.getClase() +
+                            " debe tener minimo 21 anos (edad actual: " + edad + ")");
         }
 
         if (dto.getPoseeLicenciaB() == null || !dto.getPoseeLicenciaB()) {
             throw new IllegalArgumentException(
-                "Para obtener licencia de clase " + dto.getClase() +
-                " debe poseer licencia clase B"
-            );
+                    "Para obtener licencia de clase " + dto.getClase() +
+                            " debe poseer licencia clase B");
         }
 
         if (dto.getAntiguedadLicenciaBEnAnios() == null || dto.getAntiguedadLicenciaBEnAnios() < 1) {
             throw new IllegalArgumentException(
-                "La licencia clase B debe tener minimo 1 ano de antiguedad " +
-                "(antiguedad actual: " +
-                (dto.getAntiguedadLicenciaBEnAnios() != null ? dto.getAntiguedadLicenciaBEnAnios() : 0) +
-                " ano/s)"
-            );
+                    "La licencia clase B debe tener minimo 1 ano de antiguedad " +
+                            "(antiguedad actual: " +
+                            (dto.getAntiguedadLicenciaBEnAnios() != null ? dto.getAntiguedadLicenciaBEnAnios() : 0) +
+                            " ano/s)");
         }
 
-        boolean tieneLicenciaProfesionalAnterior =
-            dto.getTieneLicenciaProfesionalAnterior() != null && dto.getTieneLicenciaProfesionalAnterior();
+        boolean tieneLicenciaProfesionalAnterior = dto.getTieneLicenciaProfesionalAnterior() != null
+                && dto.getTieneLicenciaProfesionalAnterior();
 
         if (!tieneLicenciaProfesionalAnterior && edad > 65) {
             throw new IllegalArgumentException(
-                "No puede obtener licencia profesional por primera vez siendo mayor de 65 anos " +
-                "(edad actual: " + edad + ")"
-            );
+                    "No puede obtener licencia profesional por primera vez siendo mayor de 65 anos " +
+                            "(edad actual: " + edad + ")");
         }
     }
 
     private void validarClaseNoProfesional(Integer edad) {
         if (edad < 17) {
             throw new IllegalArgumentException(
-                "Para obtener licencia debe tener minimo 17 anos (edad actual: " + edad + ")"
-            );
+                    "Para obtener licencia debe tener minimo 17 anos (edad actual: " + edad + ")");
         }
     }
 

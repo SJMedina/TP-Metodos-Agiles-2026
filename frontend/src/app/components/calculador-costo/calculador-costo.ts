@@ -1,17 +1,18 @@
 import { Component, inject, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { LicenciaCostoService } from '../../services/licencia-costo'; 
+import { LicenciaCostoService } from '../../services/licencia-costo';
 
 @Component({
   selector: 'app-calculador-costo',
   standalone: true,
-  imports: [FormsModule, CommonModule], 
+  imports: [FormsModule, CommonModule],
   templateUrl: './calculador-costo.html',
   styleUrls: ['./calculador-costo.css']
 })
 export class CalculadorCostoComponent implements OnChanges {
   @Input() claseBase: string = '';
+  @Input() vigenciaFija: number | null = null;
   @Output() costoEmitido = new EventEmitter<{ costo: number; vigencia: number }>();
 
   private costoService = inject(LicenciaCostoService);
@@ -25,6 +26,13 @@ export class CalculadorCostoComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['claseBase'] && this.claseBase) {
       this.claseSeleccionada = this.claseBase;
+      this.actualizarCosto();
+    }
+    //Agregado para calcular el costo automaticamente cuando se trata de una renovacion
+    if (changes['vigenciaFija'] && this.vigenciaFija) {
+      this.vigenciaSeleccionada = this.vigenciaFija;
+    }
+    if (this.claseSeleccionada && this.vigenciaSeleccionada) {
       this.actualizarCosto();
     }
   }

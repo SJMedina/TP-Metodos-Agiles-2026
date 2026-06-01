@@ -1,7 +1,10 @@
 <div class="page">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
     <h1>Listado de Licencias</h1>
-    <a routerLink="/emitir-licencias" class="primary-button" style="text-decoration:none;display:inline-block;">Emitir Licencia</a>
+    <a routerLink="/emitir-licencias" class="primary-button" style="text-decoration:none;display:inline-block;">Emitir
+      Licencia</a>
+    <a routerLink="/renovar-licencia" class="primary-button"
+      style="text-decoration:none;display:inline-block;">Renovar Licencia</a>
   </div>
 
   <div *ngIf="errorMensaje">{{errorMensaje}}</div>
@@ -9,12 +12,26 @@
   <table border="1" cellspacing="0" cellpadding="5" style="width:100%;" *ngIf="licencias.length > 0">
     <thead>
       <tr>
-        <th>ID</th><th>Titular</th><th>Documento</th><th>Edad</th><th>Clase</th><th>Fecha Emisión</th><th>Vigencia</th><th>Costo</th>
+        <th>ID</th>
+        <th>Titular</th>
+        <th>Documento</th>
+        <th>Edad</th>
+        <th>Clase</th>
+        <th>Fecha Emisión</th>
+        <th>Vigencia</th>
+        <th>Costo</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let l of licencias">
-        <td>{{l.id}}</td><td>{{l.titular}}</td><td>{{l.numeroDocumento}}</td><td>{{l.edad}}</td><td>{{l.clase}}</td><td>{{l.fechaEmision}}</td><td>{{l.vigencia}}</td><td>{{l.costo}}</td>
+        <td>{{l.id}}</td>
+        <td>{{l.titular}}</td>
+        <td>{{l.numeroDocumento}}</td>
+        <td>{{l.edad}}</td>
+        <td>{{l.clase}}</td>
+        <td>{{l.fechaEmision}}</td>
+        <td>{{l.vigencia}}</td>
+        <td>{{l.costo}}</td>
       </tr>
     </tbody>
   </table>
