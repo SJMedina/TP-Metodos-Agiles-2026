@@ -20,6 +20,7 @@
         <th>Fecha Emisión</th>
         <th>Vigencia</th>
         <th>Costo</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -32,6 +33,11 @@
         <td>{{l.fechaEmision}}</td>
         <td>{{l.vigencia}}</td>
         <td>{{l.costo}}</td>
+        <td>
+          <button class="primary-button" style="padding: 5px 10px; font-size: 0.9em;" (click)="imprimirLicencia(l.id)">
+            Imprimir
+          </button>
+        </td>
       </tr>
     </tbody>
   </table>
