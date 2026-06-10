@@ -68,8 +68,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/api/licencias/**", "/licencias/**").authenticated()
+                .requestMatchers("/auth/**", "/auth/super/**").permitAll()
+                .requestMatchers("/api/licencias/**", "/licencias/**", "/api/usuarios/**").authenticated()
                 .anyRequest().permitAll()
             )
             .httpBasic(basic -> {})
