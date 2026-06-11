@@ -258,4 +258,25 @@ public class LicenciaService {
                 .orElseThrow(() -> new IllegalArgumentException("Licencia no encontrada con ID: " + id));
     }
 
+    @Transactional
+    public Licencia emitirCopia(Long id) {
+        Licencia original = buscarPorId(id);
+
+        Licencia copia = new Licencia();
+        copia.setTitular(original.getTitular());
+        copia.setEdad(original.getEdad());
+        copia.setNumeroDocumento(original.getNumeroDocumento());
+        copia.setFechaNacimiento(original.getFechaNacimiento());
+        copia.setClase(original.getClase());
+        copia.setObservaciones(original.getObservaciones());
+        copia.setVigencia(original.getVigencia());
+        copia.setCosto(50.0);
+        copia.setFechaEmision(LocalDateTime.now());
+        copia.setUsuarioAdministrativo(obtenerUsuarioActual());
+
+        Licencia saved = repository.save(copia);
+        repository.flush();
+        return saved;
+    }
+
 }

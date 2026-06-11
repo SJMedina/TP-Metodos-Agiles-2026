@@ -7,7 +7,8 @@
       style="text-decoration:none;display:inline-block;">Renovar Licencia</a>
   </div>
 
-  <div *ngIf="errorMensaje">{{errorMensaje}}</div>
+  <div *ngIf="errorMensaje" class="message error">{{errorMensaje}}</div>
+  <div *ngIf="successMensaje" class="message success">{{successMensaje}}</div>
 
   <table border="1" cellspacing="0" cellpadding="5" style="width:100%;" *ngIf="licencias.length > 0">
     <thead>
@@ -17,6 +18,8 @@
         <th>Documento</th>
         <th>Edad</th>
         <th>Clase</th>
+        <th>Tipo</th>
+        <th>Usuario Administrativo</th>
         <th>Fecha Emisión</th>
         <th>Vigencia</th>
         <th>Costo</th>
@@ -30,12 +33,17 @@
         <td>{{l.numeroDocumento}}</td>
         <td>{{l.edad}}</td>
         <td>{{l.clase}}</td>
-        <td>{{l.fechaEmision}}</td>
+        <td>{{ getCopyLabel(l) }}</td>
+        <td>{{l.usuarioAdministrativo || '-'}}</td>
+        <td>{{l.fechaEmision | date:'dd/MM/yyyy HH:mm'}}</td>
         <td>{{l.vigencia}}</td>
         <td>{{l.costo}}</td>
         <td>
-          <button class="primary-button" style="padding: 5px 10px; font-size: 0.9em;" (click)="imprimirLicencia(l.id)">
+          <button class="primary-button" style="padding: 5px 10px; font-size: 0.9em; margin-right: 8px;" (click)="imprimirLicencia(l.id)">
             Imprimir
+          </button>
+          <button class="secondary-button" style="padding: 5px 10px; font-size: 0.9em;" (click)="openCopyModal(l)">
+            Emitir copia
           </button>
         </td>
       </tr>
@@ -43,4 +51,22 @@
   </table>
 
   <div *ngIf="licencias.length === 0 && !errorMensaje">No hay licencias registradas</div>
+</div>
+
+<!-- Mini-modal para confirmar emisión de copia -->
+<div *ngIf="isCopyModalOpen" class="modal-backdrop">
+  <div class="modal-card">
+    <h3>Confirmar emisión de copia</h3>
+    <div *ngIf="selectedParaCopia">
+      <p><strong>Titular:</strong> {{selectedParaCopia.titular}}</p>
+      <p><strong>Documento:</strong> {{selectedParaCopia.numeroDocumento}}</p>
+      <p><strong>Clase:</strong> {{selectedParaCopia.clase}}</p>
+      <p><strong>Costo:</strong> ${{copiaCosto}}</p>
+      <p>Se generará el comprobante de pago inmediatamente después de confirmar.</p>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+      <button class="secondary-button" (click)="cancelCopy()">Cancelar</button>
+      <button class="primary-button" (click)="confirmCopy()">Confirmar y emitir copia</button>
+    </div>
+  </div>
 </div>

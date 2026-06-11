@@ -102,10 +102,23 @@ public class LicenciaController {
         byte[] zipBytes = pdfService.generarZipImpresion(id);
 
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=\"tramite_licencia_" + id +".zip\"")
+                .header("Content-Disposition", "attachment: filename=\"tramite_licencia_" + id +".zip\"")
                 .body(zipBytes);
     }
 
+    @PostMapping("/{id}/copia")
+    public ResponseEntity<?> emitirCopia(@PathVariable Long id) {
+        LOGGER.info("Recibida solicitud de copia de licencia: id='{}'", id);
+        try {
+            Licencia licencia = service.emitirCopia(id);
+            return ResponseEntity.status(HttpStatus.CREATED).body(licencia);
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Validación inválida al emitir copia de licencia: {}", e.getMessage());
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
 
 }
 

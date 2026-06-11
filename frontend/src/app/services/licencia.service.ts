@@ -20,6 +20,10 @@ export class LicenciaService {
     return this.http.put(`${this.apiUrl}/renovar`, payload);
   }
 
+  emitirCopia(id: number): Observable<Licencia> {
+    return this.http.post<Licencia>(`${this.apiUrl}/${id}/copia`, {});
+  }
+
   listarPorDocumento(documento: string): Observable<Licencia[]> {
     return this.http.get<Licencia[]>(`${this.apiUrl}/${documento}`);
 }

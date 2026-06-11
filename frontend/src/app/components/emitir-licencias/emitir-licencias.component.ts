@@ -26,13 +26,11 @@ export class EmitirLicenciasComponent implements OnInit {
     costo: 0,
     vigencia: 1,
     poseeLicenciaB: false,
-    antiguedadLicenciaBEnAnios: 0,
-    tieneLicenciaProfesionalAnterior: false
+    antiguedadLicenciaBEnAnios: 0
   };
 
   protected mensaje: string | null = null;
   protected errorValidacion: string | null = null;
-  protected mostrandoCalculador = false;
   protected costoCalculado: number | null = null;
   protected currentUser = '';
 
@@ -72,7 +70,6 @@ export class EmitirLicenciasComponent implements OnInit {
       observaciones: this.nuevaLicencia.observaciones,
       poseeLicenciaB: this.nuevaLicencia.poseeLicenciaB,
       antiguedadLicenciaBEnAnios: this.nuevaLicencia.antiguedadLicenciaBEnAnios,
-      tieneLicenciaProfesionalAnterior: this.nuevaLicencia.tieneLicenciaProfesionalAnterior,
       vigencia: this.nuevaLicencia.vigencia,
       costo: this.costoCalculado
     };
@@ -90,17 +87,6 @@ export class EmitirLicenciasComponent implements OnInit {
     });
   }
 
-  protected toggleCalculador(): void {
-    if (!this.nuevaLicencia.clase) {
-      this.errorValidacion = 'Seleccione la clase antes de calcular el costo.';
-      return;
-    }
-    this.mostrandoCalculador = !this.mostrandoCalculador;
-  }
-
-  protected cerrarCalculador(): void {
-    this.mostrandoCalculador = false;
-  }
 
   protected handleCostoCalculado(event: { costo: number; vigencia: number }): void {
     this.costoCalculado = event.costo;
@@ -132,7 +118,7 @@ export class EmitirLicenciasComponent implements OnInit {
         this.errorValidacion = 'Para clases C, D y E debe poseer una licencia B con al menos 1 año de antigüedad.';
         return false;
       }
-      if (edad > 65 && !licencia.tieneLicenciaProfesionalAnterior) {
+      if (edad > 65) {
         this.errorValidacion = 'No puede otorgarse una licencia profesional por primera vez a mayores de 65 años.';
         return false;
       }
@@ -177,11 +163,9 @@ export class EmitirLicenciasComponent implements OnInit {
       costo: 0,
       vigencia: 1,
       poseeLicenciaB: false,
-      antiguedadLicenciaBEnAnios: 0,
-      tieneLicenciaProfesionalAnterior: false
+      antiguedadLicenciaBEnAnios: 0
     };
     this.errorValidacion = null;
     this.costoCalculado = null;
-    this.mostrandoCalculador = false;
   }
 }
