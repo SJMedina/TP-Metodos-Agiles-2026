@@ -1,13 +1,17 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { AltaTitular } from './alta-titular';
+import { TitularService } from './alta-titular';
 
-describe('AltaTitular', () => {
-  let service: AltaTitular;
+describe('TitularService', () => {
+  let service: TitularService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(AltaTitular);
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
+    service = TestBed.inject(TitularService);
   });
 
   it('should be created', () => {

@@ -1,17 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { AltaTitular } from './alta-titular';
+import { AltaTitularComponent } from './alta-titular';
 
-describe('AltaTitular', () => {
-  let component: AltaTitular;
-  let fixture: ComponentFixture<AltaTitular>;
+describe('AltaTitularComponent', () => {
+  let component: AltaTitularComponent;
+  let fixture: ComponentFixture<AltaTitularComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AltaTitular],
+      imports: [AltaTitularComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AltaTitular);
+    fixture = TestBed.createComponent(AltaTitularComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

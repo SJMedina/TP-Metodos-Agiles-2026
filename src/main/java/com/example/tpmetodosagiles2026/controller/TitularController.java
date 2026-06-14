@@ -14,7 +14,7 @@ import com.example.tpmetodosagiles2026.service.TitularService;
 
 @RestController
 @RequestMapping("/api/titulares")
-@CrossOrigin(origins = "http://localhost:42000")
+@CrossOrigin(origins = "http://localhost:4200")
 public class TitularController {
 
     private final TitularService titularService;
