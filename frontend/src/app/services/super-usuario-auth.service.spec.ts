@@ -33,7 +33,7 @@ describe('SuperUsuarioAuthService', () => {
     const mockResponse = { success: true, id: 'superadmin', token: 'super:123:superadmin' };
 
     service.login('superadmin', 'super1234').subscribe(res => {
-      expect(res.success).toBeTrue();
+      expect(res.success).toBe(true);
       expect(localStorage.getItem('super_token')).toBe('super:123:superadmin');
       expect(localStorage.getItem('super_id')).toBe('superadmin');
     });
@@ -57,11 +57,11 @@ describe('SuperUsuarioAuthService', () => {
 
   it('isAuthenticated debería devolver true cuando hay token en localStorage', () => {
     localStorage.setItem('super_token', 'super:123:superadmin');
-    expect(service.isAuthenticated()).toBeTrue();
+    expect(service.isAuthenticated()).toBe(true);
   });
 
   it('isAuthenticated debería devolver false cuando no hay token', () => {
-    expect(service.isAuthenticated()).toBeFalse();
+    expect(service.isAuthenticated()).toBe(false);
   });
 
   it('logout debería eliminar el token y el id del localStorage', () => {

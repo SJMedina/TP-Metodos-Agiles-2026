@@ -1,16 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { vi } from 'vitest';
 import { LoginSuperUsuarioComponent } from './login-super-usuario.component';
 import { SuperUsuarioAuthService } from '../../services/super-usuario-auth.service';
 
 describe('LoginSuperUsuarioComponent', () => {
   let component: LoginSuperUsuarioComponent;
   let fixture: ComponentFixture<LoginSuperUsuarioComponent>;
-  let authServiceSpy: jasmine.SpyObj<SuperUsuarioAuthService>;
+  let authServiceSpy: { login: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
-    authServiceSpy = jasmine.createSpyObj('SuperUsuarioAuthService', ['login']);
+    authServiceSpy = { login: vi.fn() };
 
     await TestBed.configureTestingModule({
       imports: [LoginSuperUsuarioComponent],
@@ -50,32 +51,32 @@ describe('LoginSuperUsuarioComponent', () => {
   });
 
   it('login exitoso debería navegar a /alta-usuario', () => {
-    authServiceSpy.login.and.returnValue(
+    authServiceSpy.login.mockReturnValue(
       of({ success: true, id: 'superadmin', token: 'super:123:superadmin' })
     );
-    const routerSpy = spyOn((component as any).router, 'navigate');
+    const routerSpy = vi.spyOn((component as any).router, 'navigate');
 
     component.id = 'superadmin';
     component.password = 'super1234';
     component.iniciarSesion();
 
     expect(routerSpy).toHaveBeenCalledWith(['/alta-usuario']);
-    expect(component.cargando).toBeFalse();
+    expect(component.cargando).toBe(false);
   });
 
   it('login con credenciales incorrectas (401) debería mostrar mensaje de error', () => {
-    authServiceSpy.login.and.returnValue(throwError(() => ({ status: 401 })));
+    authServiceSpy.login.mockReturnValue(throwError(() => ({ status: 401 })));
 
     component.id = 'superadmin';
     component.password = 'wrong';
     component.iniciarSesion();
 
     expect(component.mensaje).toBe('ID o contraseña incorrectos');
-    expect(component.cargando).toBeFalse();
+    expect(component.cargando).toBe(false);
   });
 
   it('error de conexión (status 0) debería mostrar mensaje apropiado', () => {
-    authServiceSpy.login.and.returnValue(throwError(() => ({ status: 0 })));
+    authServiceSpy.login.mockReturnValue(throwError(() => ({ status: 0 })));
 
     component.id = 'superadmin';
     component.password = 'super1234';
