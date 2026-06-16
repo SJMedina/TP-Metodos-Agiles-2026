@@ -1,5 +1,12 @@
-<nav style="padding:12px;display:flex;gap:12px;">
-<a routerLink="/listar-licencias">Listar Licencias</a>
-<a routerLink="/emitir-licencias">Emitir Licencia</a>
+<nav style="padding:14px 20px;display:flex;gap:12px;background:#15803d;">
+  <a routerLink="/listar-licencias"
+     style="color:white;font-weight:600;text-decoration:none;padding:8px 16px;border-radius:8px;"
+     routerLinkActive="active-link">Listar Licencias</a>
+  <a routerLink="/emitir-licencias"
+     style="color:white;font-weight:600;text-decoration:none;padding:8px 16px;border-radius:8px;"
+     routerLinkActive="active-link">Emitir Licencia</a>
+  <a routerLink="/licencias-expiradas"
+     style="color:white;font-weight:600;text-decoration:none;padding:8px 16px;border-radius:8px;"
+     routerLinkActive="active-link">Licencias Expiradas</a>
 </nav>
 <router-outlet></router-outlet>
