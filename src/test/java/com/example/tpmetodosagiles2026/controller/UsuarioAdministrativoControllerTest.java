@@ -139,7 +139,7 @@ class UsuarioAdministrativoControllerTest {
     @Test
     void actualizar_conNombreLargo_devuelve200() {
         ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("María José García López Fernández Rodríguez", "pass");
-        UsuarioAdministrativo usuario = new UsuarioAdministrativo("emp01",
+        UsuarioAdministrativo usuario = new UsuarioAdministrativo("emp01", 
                 "María José García López Fernández Rodríguez", "$2a$HASH");
 
         when(service.actualizar("emp01", dto)).thenReturn(usuario);
