@@ -1,5 +1,6 @@
 package com.example.tpmetodosagiles2026.service;
 
+import com.example.tpmetodosagiles2026.dto.ActualizarUsuarioDTO;
 import com.example.tpmetodosagiles2026.dto.CrearUsuarioDTO;
 import com.example.tpmetodosagiles2026.model.UsuarioAdministrativo;
 import com.example.tpmetodosagiles2026.repository.UsuarioAdministrativoRepository;
@@ -11,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -91,6 +93,164 @@ class UsuarioAdministrativoServiceTest {
         assertEquals(2, resultado.size());
         assertEquals("emp01", resultado.get(0).getId());
         assertEquals("emp02", resultado.get(1).getId());
+    }
+
+    @Test
+    void actualizar_nombreSolo_actualizaNombre() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("Nuevo Nombre", null);
+        UsuarioAdministrativo existente = new UsuarioAdministrativo("emp01", "Nombre Antiguo", "$2a$HASH");
+
+        when(repository.findById("emp01")).thenReturn(Optional.of(existente));
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        UsuarioAdministrativo resultado = service.actualizar("emp01", dto);
+
+        assertEquals("Nuevo Nombre", resultado.getNombre());
+        assertEquals("$2a$HASH", resultado.getPasswordHash());
+        verify(repository).save(any(UsuarioAdministrativo.class));
+    }
+
+    @Test
+    void actualizar_passwordSolo_actualizaPassword() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO(null, "newPass");
+        UsuarioAdministrativo existente = new UsuarioAdministrativo("emp01", "Juan", "$2a$HASH");
+
+        when(repository.findById("emp01")).thenReturn(Optional.of(existente));
+        when(passwordEncoder.encode("newPass")).thenReturn("$2a$NEWHASH");
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        UsuarioAdministrativo resultado = service.actualizar("emp01", dto);
+
+        assertEquals("Juan", resultado.getNombre());
+        assertEquals("$2a$NEWHASH", resultado.getPasswordHash());
+    }
+
+    @Test
+    void actualizar_amboscampos_actualizaAmbos() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("Nuevo Nombre", "newPass");
+        UsuarioAdministrativo existente = new UsuarioAdministrativo("emp01", "Nombre Antiguo", "$2a$HASH");
+
+        when(repository.findById("emp01")).thenReturn(Optional.of(existente));
+        when(passwordEncoder.encode("newPass")).thenReturn("$2a$NEWHASH");
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        UsuarioAdministrativo resultado = service.actualizar("emp01", dto);
+
+        assertEquals("Nuevo Nombre", resultado.getNombre());
+        assertEquals("$2a$NEWHASH", resultado.getPasswordHash());
+    }
+
+    @Test
+    void actualizar_usuarioNoExiste_lanzaExcepcion() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("Nuevo", "pass");
+
+        when(repository.findById("noExiste")).thenReturn(Optional.empty());
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> service.actualizar("noExiste", dto)
+        );
+
+        assertEquals("Usuario no encontrado: noExiste", ex.getMessage());
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    void actualizar_nombreVacio_noActualizaNombre() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("", "newPass");
+        UsuarioAdministrativo existente = new UsuarioAdministrativo("emp01", "Juan", "$2a$HASH");
+
+        when(repository.findById("emp01")).thenReturn(Optional.of(existente));
+        when(passwordEncoder.encode("newPass")).thenReturn("$2a$NEWHASH");
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        UsuarioAdministrativo resultado = service.actualizar("emp01", dto);
+
+        assertEquals("Juan", resultado.getNombre());
+    }
+
+    @Test
+    void actualizar_passwordVacio_noActualizaPassword() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("Nuevo Nombre", "");
+        UsuarioAdministrativo existente = new UsuarioAdministrativo("emp01", "Juan", "$2a$HASH");
+
+        when(repository.findById("emp01")).thenReturn(Optional.of(existente));
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        UsuarioAdministrativo resultado = service.actualizar("emp01", dto);
+
+        assertEquals("$2a$HASH", resultado.getPasswordHash());
+    }
+
+    @Test
+    void actualizar_conNulos_noActualiza() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO(null, null);
+        UsuarioAdministrativo existente = new UsuarioAdministrativo("emp01", "Juan", "$2a$HASH");
+
+        when(repository.findById("emp01")).thenReturn(Optional.of(existente));
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        UsuarioAdministrativo resultado = service.actualizar("emp01", dto);
+
+        assertEquals("Juan", resultado.getNombre());
+        assertEquals("$2a$HASH", resultado.getPasswordHash());
+    }
+
+    @Test
+    void actualizar_idNoSeCambia() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("Nuevo", "pass");
+        UsuarioAdministrativo existente = new UsuarioAdministrativo("emp01", "Juan", "$2a$HASH");
+
+        when(repository.findById("emp01")).thenReturn(Optional.of(existente));
+        when(passwordEncoder.encode("pass")).thenReturn("$2a$NEWHASH");
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        UsuarioAdministrativo resultado = service.actualizar("emp01", dto);
+
+        assertEquals("emp01", resultado.getId());
+    }
+
+    @Test
+    void actualizar_passwordEspecial_seHasheaCorrectamente() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("User", "p@ss!#$%");
+        UsuarioAdministrativo existente = new UsuarioAdministrativo("emp01", "Juan", "$2a$HASH");
+
+        when(repository.findById("emp01")).thenReturn(Optional.of(existente));
+        when(passwordEncoder.encode("p@ss!#$%")).thenReturn("$2a$SPECIAL");
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        UsuarioAdministrativo resultado = service.actualizar("emp01", dto);
+
+        assertEquals("$2a$SPECIAL", resultado.getPasswordHash());
+        verify(passwordEncoder).encode("p@ss!#$%");
+    }
+
+    @Test
+    void actualizar_nombreLargo_seActualizaCompleto() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("María José García López Fernández", "pass");
+        UsuarioAdministrativo existente = new UsuarioAdministrativo("emp01", "Juan", "$2a$HASH");
+
+        when(repository.findById("emp01")).thenReturn(Optional.of(existente));
+        when(passwordEncoder.encode("pass")).thenReturn("$2a$NEWHASH");
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        UsuarioAdministrativo resultado = service.actualizar("emp01", dto);
+
+        assertEquals("María José García López Fernández", resultado.getNombre());
+    }
+
+    @Test
+    void actualizar_espaciosEnBlanco_nombreNoSeActualiza() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("   ", "pass");
+        UsuarioAdministrativo existente = new UsuarioAdministrativo("emp01", "Juan", "$2a$HASH");
+
+        when(repository.findById("emp01")).thenReturn(Optional.of(existente));
+        when(passwordEncoder.encode("pass")).thenReturn("$2a$NEWHASH");
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        UsuarioAdministrativo resultado = service.actualizar("emp01", dto);
+
+        assertEquals("Juan", resultado.getNombre());
     }
 
     private CrearUsuarioDTO crearDTO(String id, String nombre, String password) {

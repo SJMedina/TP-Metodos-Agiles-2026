@@ -1,5 +1,6 @@
 package com.example.tpmetodosagiles2026.controller;
 
+import com.example.tpmetodosagiles2026.dto.ActualizarUsuarioDTO;
 import com.example.tpmetodosagiles2026.dto.CrearUsuarioDTO;
 import com.example.tpmetodosagiles2026.model.UsuarioAdministrativo;
 import com.example.tpmetodosagiles2026.service.UsuarioAdministrativoService;
@@ -79,6 +80,89 @@ class UsuarioAdministrativoControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(0, response.getBody().size());
+    }
+
+    @Test
+    void actualizar_datosValidos_devuelve200() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("Nuevo Nombre", "newPass");
+        UsuarioAdministrativo usuario = new UsuarioAdministrativo("emp01", "Nuevo Nombre", "$2a$HASH");
+
+        when(service.actualizar("emp01", dto)).thenReturn(usuario);
+
+        ResponseEntity<?> response = controller.actualizar("emp01", dto);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        UsuarioAdministrativo body = (UsuarioAdministrativo) response.getBody();
+        assertEquals("Nuevo Nombre", body.getNombre());
+    }
+
+    @Test
+    void actualizar_usuarioNoExiste_devuelve404() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("Nuevo", "pass");
+
+        when(service.actualizar("noExiste", dto))
+                .thenThrow(new IllegalArgumentException("Usuario no encontrado: noExiste"));
+
+        ResponseEntity<?> response = controller.actualizar("noExiste", dto);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        @SuppressWarnings("unchecked")
+        Map<String, Object> body = (Map<String, Object>) response.getBody();
+        assertEquals("Usuario no encontrado: noExiste", body.get("error"));
+    }
+
+    @Test
+    void actualizar_soloNombre_devuelve200() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("Nuevo", null);
+        UsuarioAdministrativo usuario = new UsuarioAdministrativo("emp01", "Nuevo", "$2a$HASH");
+
+        when(service.actualizar("emp01", dto)).thenReturn(usuario);
+
+        ResponseEntity<?> response = controller.actualizar("emp01", dto);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void actualizar_soloPassword_devuelve200() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO(null, "newPass");
+        UsuarioAdministrativo usuario = new UsuarioAdministrativo("emp01", "Juan", "$2a$NEWHASH");
+
+        when(service.actualizar("emp01", dto)).thenReturn(usuario);
+
+        ResponseEntity<?> response = controller.actualizar("emp01", dto);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void actualizar_conNombreLargo_devuelve200() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("María José García López Fernández Rodríguez", "pass");
+        UsuarioAdministrativo usuario = new UsuarioAdministrativo("emp01",
+                "María José García López Fernández Rodríguez", "$2a$HASH");
+
+        when(service.actualizar("emp01", dto)).thenReturn(usuario);
+
+        ResponseEntity<?> response = controller.actualizar("emp01", dto);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void actualizar_conAmbos_sirvePersistencia() {
+        ActualizarUsuarioDTO dto = new ActualizarUsuarioDTO("ActualizadoTest", "newPassword123");
+        UsuarioAdministrativo usuario = new UsuarioAdministrativo("emp01", "ActualizadoTest", "$2a$HASH123");
+
+        when(service.actualizar("emp01", dto)).thenReturn(usuario);
+
+        ResponseEntity<?> response = controller.actualizar("emp01", dto);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        UsuarioAdministrativo body = (UsuarioAdministrativo) response.getBody();
+        assertEquals("emp01", body.getId());
+        assertEquals("ActualizadoTest", body.getNombre());
+        assertEquals("$2a$HASH123", body.getPasswordHash());
     }
 
     private CrearUsuarioDTO crearDTO(String id, String nombre, String password) {

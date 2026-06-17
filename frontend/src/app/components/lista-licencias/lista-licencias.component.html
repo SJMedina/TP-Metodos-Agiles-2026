@@ -1,10 +1,15 @@
+<div style="position:fixed;top:20px;right:20px;z-index:1000;">
+  <a routerLink="/modificar-usuario" class="primary-button" style="text-decoration:none;display:inline-block;">Modificar Usuario</a>
+</div>
+
 <div class="page">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+  <div style="display:flex;justify-content:center;align-items:center;margin-bottom:20px;">
     <h1>Listado de Licencias</h1>
-    <a routerLink="/emitir-licencias" class="primary-button" style="text-decoration:none;display:inline-block;">Emitir
-      Licencia</a>
-    <a routerLink="/renovar-licencia" class="primary-button"
-      style="text-decoration:none;display:inline-block;">Renovar Licencia</a>
+  </div>
+
+  <div style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:20px;">
+    <a routerLink="/emitir-licencias" class="primary-button" style="text-decoration:none;display:inline-block;">Emitir Licencia</a>
+    <a routerLink="/renovar-licencia" class="primary-button" style="text-decoration:none;display:inline-block;">Renovar Licencia</a>
   </div>
 
   <div *ngIf="errorMensaje">{{errorMensaje}}</div>

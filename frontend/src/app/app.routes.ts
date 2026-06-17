@@ -8,6 +8,7 @@ import { RenovarVencimientoComponent } from './components/renovar-licencia/venci
 import { RenovarModificacionComponent } from './components/renovar-licencia/modifacion/renovar-modificacion.component';
 import { AltaUsuarioComponent } from './components/alta-usuario/alta-usuario.component';
 import { LoginSuperUsuarioComponent } from './components/login-super-usuario/login-super-usuario.component';
+import { ModificarUsuarioComponent } from './components/modificar-usuario/modificar-usuario.component';
 import { superUsuarioGuard } from './guards/super-usuario.guard';
 
 export const routes: Routes = [
@@ -20,5 +21,6 @@ export const routes: Routes = [
   { path: 'renovar-licencia/modificacion', component: RenovarModificacionComponent, canActivate: [authGuard] },
   { path: 'login-super', component: LoginSuperUsuarioComponent },
   { path: 'alta-usuario', component: AltaUsuarioComponent, canActivate: [superUsuarioGuard] },
+  { path: 'modificar-usuario', component: ModificarUsuarioComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: 'login' }
 ];
