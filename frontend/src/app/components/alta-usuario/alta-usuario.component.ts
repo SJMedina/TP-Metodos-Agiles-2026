@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -21,7 +21,9 @@ export class AltaUsuarioComponent {
 
   constructor(
     private usuarioService: UsuarioAdministrativoService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
   ) {}
 
   darDeAlta(): void {
@@ -36,23 +38,29 @@ export class AltaUsuarioComponent {
     this.cargando = true;
     this.usuarioService.crear({ id: this.id.trim(), nombre: this.nombre.trim(), password: this.password }).subscribe({
       next: () => {
-        this.cargando = false;
-        this.mensaje = 'Usuario creado exitosamente';
-        this.esError = false;
-        this.id = '';
-        this.nombre = '';
-        this.password = '';
+        this.ngZone.run(() => {
+          this.cargando = false;
+          this.mensaje = 'Usuario creado exitosamente';
+          this.esError = false;
+          this.id = '';
+          this.nombre = '';
+          this.password = '';
+          this.cdr.detectChanges();
+        });
       },
       error: (err: any) => {
-        this.cargando = false;
-        this.esError = true;
-        if (err.status === 400) {
-          this.mensaje = err.error?.error || 'Datos inválidos';
-        } else if (err.status === 0) {
-          this.mensaje = 'Error de conexión con el servidor';
-        } else {
-          this.mensaje = 'Error al crear el usuario';
-        }
+        this.ngZone.run(() => {
+          this.cargando = false;
+          this.esError = true;
+          if (err.status === 400) {
+            this.mensaje = err.error?.error || 'Datos inválidos';
+          } else if (err.status === 0) {
+            this.mensaje = 'Error de conexión con el servidor';
+          } else {
+            this.mensaje = 'Error al crear el usuario';
+          }
+          this.cdr.detectChanges();
+        });
       }
     });
   }

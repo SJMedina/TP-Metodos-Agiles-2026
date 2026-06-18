@@ -14,17 +14,18 @@ interface SuperLoginResponse {
 export class SuperUsuarioAuthService {
   private readonly http = inject(HttpClient);
   private readonly platformId = inject(PLATFORM_ID);
-  private readonly apiUrl = `${environment.apiUrl}/auth/super/login`.replace('/api', '');
+  private readonly loginUrl = `${environment.apiUrl.replace('/api', '')}/auth/super/login`;
 
   login(id: string, password: string): Observable<SuperLoginResponse> {
     return this.http.post<SuperLoginResponse>(
-      `${environment.apiUrl.replace('/api', '')}/auth/super/login`,
+      this.loginUrl,
       { username: id, password }
     ).pipe(
       tap(response => {
         if (response.success && isPlatformBrowser(this.platformId)) {
           localStorage.setItem('super_token', response.token);
           localStorage.setItem('super_id', response.id);
+          localStorage.setItem('credentials', JSON.stringify({ username: id, password }));
         }
       })
     );
@@ -34,6 +35,7 @@ export class SuperUsuarioAuthService {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem('super_token');
       localStorage.removeItem('super_id');
+      localStorage.removeItem('credentials');
     }
   }
 
