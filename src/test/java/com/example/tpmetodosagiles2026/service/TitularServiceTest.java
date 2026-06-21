@@ -8,6 +8,7 @@ import com.example.tpmetodosagiles2026.repository.TitularRepository;
 import org.mockito.*;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -120,4 +121,44 @@ class TitularServiceTest {
         
         assertEquals("El código postal debe contener exactamente 4 dígitos.", ex.getMessage());
     }
+
+
+    @Test
+    void modificarTitular_DebeActualizarCamposPermitidosEIgnorarProtegidos() {
+        
+        Titular titularOriginal = new Titular();
+        titularOriginal.setId(1L);
+        titularOriginal.setNombre("Juan");
+        titularOriginal.setApellido("Perez");
+        titularOriginal.setNumeroDocumento("12345678"); // DNI Original
+        titularOriginal.setGrupoSanguineo("A+");
+
+        
+        when(titularRepository.findById(1L)).thenReturn(Optional.of(titularOriginal));
+        when(titularRepository.save(any(Titular.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+      
+        Titular datosNuevos = new Titular();
+        datosNuevos.setNombre("Juan Carlos"); // nombre vaalido
+        datosNuevos.setApellido("Perez");
+        datosNuevos.setNumeroDocumento("99999999"); // intento de hackear el DNI
+        datosNuevos.setGrupoSanguineo("0-");
+
+
+        Titular resultado = titularService.modificarTitular(1L, datosNuevos);
+
+
+        assertEquals("Juan Carlos", resultado.getNombre());
+        assertEquals("0-", resultado.getGrupoSanguineo());
+        
+
+        assertEquals("12345678", resultado.getNumeroDocumento());
+        
+ 
+        verify(titularRepository, times(1)).save(any(Titular.class));
+    }
+
+
+
+
 }

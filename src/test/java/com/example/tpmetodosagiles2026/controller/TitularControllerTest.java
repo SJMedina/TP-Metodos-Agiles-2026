@@ -15,9 +15,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 
 @WebMvcTest(TitularController.class)
@@ -66,5 +68,46 @@ class TitularControllerTest {
                 .content(objectMapper.writeValueAsString(titular)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(mensajeError));
+    }
+
+
+    @Test
+    void modificarTitular_DebeRetornarOk_CuandoLaActualizacionEsExitosa() throws Exception {
+        
+        Long id = 1L;
+        Titular titularModificado = new Titular();
+        titularModificado.setId(id);
+        titularModificado.setNombre("Juan Carlos");
+        titularModificado.setApellido("Perez");
+
+        when(titularService.modificarTitular(eq(id), any(Titular.class))).thenReturn(titularModificado);
+
+        String jsonRequestBody = "{\"nombre\":\"Juan Carlos\",\"apellido\":\"Perez\"}";
+
+        mockMvc.perform(put("/api/titulares/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonRequestBody))
+                .andExpect(status().isOk()) // Esperamos un 200 OK
+                .andExpect(jsonPath("$.nombre").value("Juan Carlos")) // Verificamos el JSON de respuesta
+                .andExpect(jsonPath("$.apellido").value("Perez"));
+    }
+
+    @Test
+    void modificarTitular_DebeRetornarBadRequest_CuandoFallaLaValidacionDeNegocio() throws Exception {
+            Long id = 1L;
+        
+    
+        when(titularService.modificarTitular(eq(id), any(Titular.class)))
+                .thenThrow(new IllegalArgumentException("El código postal debe contener exactamente 4 dígitos."));
+
+        String jsonRequestBody = "{\"nombre\":\"Juan\",\"direccion\":{\"codigoPostal\":\"12\"}}";
+
+       
+        mockMvc.perform(put("/api/titulares/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonRequestBody))
+                .andExpect(status().isBadRequest()) 
+                .andExpect(content().string("El código postal debe contener exactamente 4 dígitos.")); 
+
     }
 }

@@ -15,4 +15,12 @@ export class TitularService {
   registrarTitular(titular: Titular): Observable<Titular> {
     return this.http.post<Titular>(this.apiUrl, titular);
   }
+
+  modificarTitular(id: number, titular: Titular): Observable<Titular> {
+    return this.http.put<Titular>(`${this.apiUrl}/${id}`, titular);
+  }
+
+  buscarPorId(id: number): Observable<Titular> {
+    return this.http.get<Titular>(`${this.apiUrl}/${id}`);
+  }
 }

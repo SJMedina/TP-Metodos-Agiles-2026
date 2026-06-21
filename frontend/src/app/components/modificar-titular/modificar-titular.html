@@ -1,0 +1,179 @@
+<div class="alta-container">
+  <div class="form-card">
+    <div class="card-header">
+      <h2>Modificar Titular</h2>
+      <p>Actualice los datos personales de un titular.</p>
+    </div>
+
+    <form [formGroup]="titularForm" (ngSubmit)="onSubmit()" class="form-body">
+      
+      <h3 class="section-title">Datos Personales</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="tipoDocumento">Tipo Documento <span class="required">*</span></label>
+          <select id="tipoDocumento" formControlName="tipoDocumento">
+            <option value="" disabled selected>Seleccione...</option>
+            <option value="DNI">DNI</option>
+            <option value="LC">LC</option>
+            <option value="LE">LE</option>
+            <option value="Pasaporte">Pasaporte</option>
+          </select>
+          <span class="error-text" *ngIf="titularForm.get('tipoDocumento')?.invalid && titularForm.get('tipoDocumento')?.touched">
+            El tipo es requerido.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="numeroDocumento">Nº de Documento <span class="required">*</span></label>
+          <input type="text" id="numeroDocumento" formControlName="numeroDocumento" placeholder="Ej: 12345678">
+          <span class="error-text" *ngIf="titularForm.get('numeroDocumento')?.invalid && titularForm.get('numeroDocumento')?.touched">
+            El número debe tener 8 dígitos.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="nombre">Nombre <span class="required">*</span></label>
+          <input type="text" id="nombre" formControlName="nombre" placeholder="Ej: Juan">
+          <span class="error-text" *ngIf="titularForm.get('nombre')?.invalid && titularForm.get('nombre')?.touched">
+            El nombre es requerido.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="apellido">Apellido <span class="required">*</span></label>
+          <input type="text" id="apellido" formControlName="apellido" placeholder="Ej: Pérez">
+          <span class="error-text" *ngIf="titularForm.get('apellido')?.invalid && titularForm.get('apellido')?.touched">
+            El apellido es requerido.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="fechaNacimiento">Fecha de Nacimiento <span class="required">*</span></label>
+          <input type="date" id="fechaNacimiento" formControlName="fechaNacimiento">
+          <span class="error-text" *ngIf="titularForm.get('fechaNacimiento')?.hasError('required') && titularForm.get('fechaNacimiento')?.touched">
+            La fecha es requerida.
+          </span>
+          <span class="error-text" *ngIf="titularForm.get('fechaNacimiento')?.hasError('menorDeEdad') && titularForm.get('fechaNacimiento')?.touched">
+            El titular debe ser mayor de 18 años.
+          </span>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <h3 class="section-title">Domicilio</h3>
+      <div class="form-grid" formGroupName="direccion">
+        
+        <div class="form-group">
+          <label for="calle">Calle <span class="required">*</span></label>
+          <input type="text" id="calle" formControlName="calle" placeholder="Ej: San Martín">
+          <span class="error-text" *ngIf="titularForm.get('direccion.calle')?.invalid && titularForm.get('direccion.calle')?.touched">
+            La calle es requerida.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="nro">Número <span class="required">*</span></label>
+          <input type="text" id="nro" formControlName="nro" placeholder="Ej: 1234">
+          <span class="error-text" *ngIf="titularForm.get('direccion.nro')?.invalid && titularForm.get('direccion.nro')?.touched">
+            Ingrese un número válido.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="codigoPostal">Código Postal <span class="required">*</span></label>
+          <input type="text" id="codigoPostal" formControlName="codigoPostal" placeholder="Ej: 3000">
+          <span class="error-text" *ngIf="titularForm.get('direccion.codigoPostal')?.invalid && titularForm.get('direccion.codigoPostal')?.touched">
+            Debe tener exactamente 4 dígitos.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="localidad">Localidad <span class="required">*</span></label>
+          <input type="text" id="localidad" formControlName="localidad" placeholder="Ej: Santa Fe">
+          <span class="error-text" *ngIf="titularForm.get('direccion.localidad')?.invalid && titularForm.get('direccion.localidad')?.touched">
+            La localidad es requerida.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="provincia">Provincia <span class="required">*</span></label>
+          <input type="text" id="provincia" formControlName="provincia" placeholder="Ej: Santa Fe">
+          <span class="error-text" *ngIf="titularForm.get('direccion.provincia')?.invalid && titularForm.get('direccion.provincia')?.touched">
+            La provincia es requerida.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="piso">Piso (Opcional)</label>
+          <input type="text" id="piso" formControlName="piso" placeholder="Ej: 2">
+        </div>
+
+        <div class="form-group">
+          <label for="depto">Depto. (Opcional)</label>
+          <input type="text" id="depto" formControlName="depto" placeholder="Ej: B">
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <h3 class="section-title">Datos Adicionales</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="claseSolicitada">Clase Solicitada <span class="required">*</span></label>
+          <select id="claseSolicitada" formControlName="claseSolicitada">
+            <option value="" disabled selected>Seleccione...</option>
+            <option value="A">Clase A</option>
+            <option value="B">Clase B</option>
+            <option value="C">Clase C</option>
+            <option value="D">Clase D</option>
+            <option value="E">Clase E</option>
+            <option value="F">Clase F</option>
+            <option value="G">Clase G</option>
+          </select>
+          <span class="error-text" *ngIf="titularForm.get('claseSolicitada')?.invalid && titularForm.get('claseSolicitada')?.touched">
+            La clase es requerida.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="grupoSanguineo">Grupo y Factor <span class="required">*</span></label>
+          <select id="grupoSanguineo" formControlName="grupoSanguineo">
+            <option value="" disabled selected>Seleccione...</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="0+">0+</option>
+            <option value="0-">0-</option>
+          </select>
+          <span class="error-text" *ngIf="titularForm.get('grupoSanguineo')?.invalid && titularForm.get('grupoSanguineo')?.touched">
+            El grupo sanguíneo es requerido.
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group checkbox-group" style="margin-top: 1.5rem;">
+        <label class="toggle-container">
+          <input type="checkbox" id="donanteOrganos" formControlName="donanteOrganos">
+          <span class="checkmark"></span>
+          ¿Es donante de órganos?
+        </label>
+      </div>
+
+      <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button type="button" class="btn-secondary" (click)="onSubmit(true)" [disabled]="titularForm.invalid" style="background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+          Guardar y Renovar Licencia
+        </button>
+        
+        <button type="button" class="btn-submit" [disabled]="titularForm.invalid" (click)="onSubmit(false)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          Solo Guardar
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
