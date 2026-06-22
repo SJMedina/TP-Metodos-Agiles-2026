@@ -1,9 +1,23 @@
 package com.example.tpmetodosagiles2026.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "licencias")
 public class Licencia {
@@ -33,50 +47,20 @@ public class Licencia {
     @Column(nullable = false)
     private String numeroDocumento;
 
+    @Enumerated(EnumType.STRING)
+    private GrupoSanguineo grupoSanguineo;
+
+    @Enumerated(EnumType.STRING)
+    private FactorRH factorRH;
+
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private Boolean donanteOrganos = false;
+
+    // true = registro actual; false = historial
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private Boolean vigente = true;
+
     private Integer vigencia;
     private Double costo;
     private LocalDate fechaNacimiento;
-
-    public Licencia() {
-    }
-
-    public Licencia(String titular, Integer edad, String clase, String numeroDocumento) {
-        this.titular = titular;
-        this.edad = edad;
-        this.clase = clase;
-        this.numeroDocumento = numeroDocumento;
-    }
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getTitular() { return titular; }
-    public void setTitular(String titular) { this.titular = titular; }
-
-    public Integer getEdad() { return edad; }
-    public void setEdad(Integer edad) { this.edad = edad; }
-
-    public String getClase() { return clase; }
-    public void setClase(String clase) { this.clase = clase; }
-
-    public LocalDateTime getFechaEmision() { return fechaEmision; }
-    public void setFechaEmision(LocalDateTime fechaEmision) { this.fechaEmision = fechaEmision; }
-
-    public String getObservaciones() { return observaciones; }
-    public void setObservaciones(String observaciones) { this.observaciones = observaciones; }
-
-    public String getUsuarioAdministrativo() { return usuarioAdministrativo; }
-    public void setUsuarioAdministrativo(String usuarioAdministrativo) { this.usuarioAdministrativo = usuarioAdministrativo; }
-
-    public String getNumeroDocumento() { return numeroDocumento; }
-    public void setNumeroDocumento(String numeroDocumento) { this.numeroDocumento = numeroDocumento; }
-
-    public Integer getVigencia() { return vigencia; }
-    public void setVigencia(Integer vigencia) { this.vigencia = vigencia; }
-
-    public Double getCosto() { return costo; }
-    public void setCosto(Double costo) { this.costo = costo; }
-
-    public LocalDate getFechaNacimiento() { return fechaNacimiento; }
-    public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
 }

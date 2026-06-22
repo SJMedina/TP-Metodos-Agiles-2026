@@ -10,6 +10,10 @@ export interface Licencia {
   fechaEmision?: string;
   costo?: number;
   vigencia?: number;
+  vigente?: boolean;
+  grupoSanguineo?: string;
+  factorRH?: string;
+  donanteOrganos?: boolean;
   poseeLicenciaB?: boolean;
   antiguedadLicenciaBEnAnios?: number;
   tieneLicenciaProfesionalAnterior?: boolean;

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.tpmetodosagiles2026.dto.EmitirLicenciaDTO;
 import com.example.tpmetodosagiles2026.dto.RenovarLicenciaDTO;
+import com.example.tpmetodosagiles2026.model.FactorRH;
+import com.example.tpmetodosagiles2026.model.GrupoSanguineo;
 import com.example.tpmetodosagiles2026.model.Licencia;
 import com.example.tpmetodosagiles2026.repository.LicenciaRepository;
 
@@ -62,40 +65,51 @@ public class LicenciaService {
 
     @Transactional
     public Licencia renovar(RenovarLicenciaDTO dto) {
-        Licencia licencia = repository.findById(dto.getId())
+        Licencia licenciaActual = repository.findById(dto.getId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "No existe una licencia con id=" + dto.getId()));
+
+        if (!Boolean.TRUE.equals(licenciaActual.getVigente())) {
+            throw new IllegalArgumentException("La licencia no está vigente y no puede ser renovada");
+        }
 
         validarVigenciaRenovacion(dto.getVigencia());
 
         boolean esPorVencimiento = Boolean.TRUE.equals(dto.getRenovarPorVencimiento());
 
         if (esPorVencimiento) {
-            validarVentanaRenovacion(licencia);
+            validarVentanaRenovacion(licenciaActual);
         }
 
-        if (dto.getTitular() != null)
-            licencia.setTitular(dto.getTitular().trim());
-        if (dto.getEdad() != null)
-            licencia.setEdad(dto.getEdad());
-        if (dto.getFechaNacimiento() != null)
-            licencia.setFechaNacimiento(dto.getFechaNacimiento());
-        if (dto.getObservaciones() != null)
-            licencia.setObservaciones(dto.getObservaciones().trim());
+        // Marcar la licencia actual como histórica
+        licenciaActual.setVigente(false);
+        repository.save(licenciaActual);
 
-        licencia.setVigencia(dto.getVigencia());
-        licencia.setFechaEmision(LocalDateTime.now());
-        licencia.setUsuarioAdministrativo(obtenerUsuarioActual());
+        // Crear nueva licencia con los datos actualizados
+        Licencia nueva = new Licencia();
+        nueva.setNumeroDocumento(licenciaActual.getNumeroDocumento());
+        nueva.setClase(licenciaActual.getClase());
+        nueva.setGrupoSanguineo(licenciaActual.getGrupoSanguineo());
+        nueva.setFactorRH(licenciaActual.getFactorRH());
+        nueva.setDonanteOrganos(licenciaActual.getDonanteOrganos());
+        nueva.setTitular(dto.getTitular() != null ? dto.getTitular().trim() : licenciaActual.getTitular());
+        nueva.setEdad(dto.getEdad() != null ? dto.getEdad() : licenciaActual.getEdad());
+        nueva.setFechaNacimiento(dto.getFechaNacimiento() != null ? dto.getFechaNacimiento() : licenciaActual.getFechaNacimiento());
+        nueva.setObservaciones(dto.getObservaciones() != null ? dto.getObservaciones().trim() : licenciaActual.getObservaciones());
+        nueva.setVigencia(dto.getVigencia());
+        nueva.setFechaEmision(LocalDateTime.now());
+        nueva.setUsuarioAdministrativo(obtenerUsuarioActual());
+        nueva.setVigente(true);
 
-        double costo = costoService.calcularCostoTotal(licencia.getClase(), dto.getVigencia());
-        licencia.setCosto(costo);
+        double costo = costoService.calcularCostoTotal(licenciaActual.getClase(), dto.getVigencia());
+        nueva.setCosto(costo);
 
-        LOGGER.info("Renovando licencia id={} tipo={}", licencia.getId(),
+        LOGGER.info("Renovando licencia id={} tipo={}", licenciaActual.getId(),
                 esPorVencimiento ? "VENCIMIENTO" : "MODIFICACION_DATOS");
 
-        Licencia saved = repository.save(licencia);
+        Licencia saved = repository.save(nueva);
         repository.flush();
-        LOGGER.info("Licencia renovada id={}", saved.getId());
+        LOGGER.info("Nueva licencia creada id={} (reemplaza id={})", saved.getId(), licenciaActual.getId());
         return saved;
     }
 
@@ -243,6 +257,22 @@ public class LicenciaService {
             return authentication.getName();
         }
         return "SISTEMA";
+    }
+
+    public List<Licencia> listarVigentes(String nombreApellido, String grupoSanguineo, String factorRH, Boolean donanteOrganos) {
+        GrupoSanguineo gs = (grupoSanguineo != null && !grupoSanguineo.isEmpty())
+                ? GrupoSanguineo.valueOf(grupoSanguineo) : null;
+        FactorRH frh = (factorRH != null && !factorRH.isEmpty())
+                ? FactorRH.valueOf(factorRH) : null;
+        String nombre = (nombreApellido != null && !nombreApellido.trim().isEmpty())
+                ? nombreApellido.trim().toLowerCase() : null;
+
+        return repository.findByVigenteTrue().stream()
+                .filter(l -> nombre == null || l.getTitular().toLowerCase().contains(nombre))
+                .filter(l -> gs == null || gs.equals(l.getGrupoSanguineo()))
+                .filter(l -> frh == null || frh.equals(l.getFactorRH()))
+                .filter(l -> donanteOrganos == null || donanteOrganos.equals(l.getDonanteOrganos()))
+                .collect(Collectors.toList());
     }
 
     public List<Licencia> listar() {

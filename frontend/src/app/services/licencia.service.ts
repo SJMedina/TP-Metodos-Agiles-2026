@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Licencia } from '../models/licencia';
@@ -22,5 +22,19 @@ export class LicenciaService {
 
   listarPorDocumento(documento: string): Observable<Licencia[]> {
     return this.http.get<Licencia[]>(`${this.apiUrl}/${documento}`);
-}
+  }
+
+  listarVigentes(filtros: {
+    nombreApellido?: string;
+    grupoSanguineo?: string;
+    factorRH?: string;
+    donanteOrganos?: boolean;
+  }): Observable<Licencia[]> {
+    let params = new HttpParams();
+    if (filtros.nombreApellido) params = params.set('nombreApellido', filtros.nombreApellido);
+    if (filtros.grupoSanguineo) params = params.set('grupoSanguineo', filtros.grupoSanguineo);
+    if (filtros.factorRH) params = params.set('factorRH', filtros.factorRH);
+    if (filtros.donanteOrganos !== undefined) params = params.set('donanteOrganos', String(filtros.donanteOrganos));
+    return this.http.get<Licencia[]>(`${this.apiUrl}/vigentes`, { params });
+  }
 }

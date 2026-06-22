@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.tpmetodosagiles2026.dto.EmitirLicenciaDTO;
@@ -69,6 +70,15 @@ public class LicenciaController {
             error.put("error", e.getMessage());
             return ResponseEntity.badRequest().body(error);
         }
+    }
+
+    @GetMapping("/vigentes")
+    public ResponseEntity<List<Licencia>> listarVigentes(
+            @RequestParam(required = false) String nombreApellido,
+            @RequestParam(required = false) String grupoSanguineo,
+            @RequestParam(required = false) String factorRH,
+            @RequestParam(required = false) Boolean donanteOrganos) {
+        return ResponseEntity.ok(service.listarVigentes(nombreApellido, grupoSanguineo, factorRH, donanteOrganos));
     }
 
     @GetMapping

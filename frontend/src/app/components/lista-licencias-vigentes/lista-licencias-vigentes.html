@@ -1,0 +1,94 @@
+<div class="page">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <h1>Listado de Licencias Vigentes</h1>
+    <a routerLink="/listar-licencias" class="primary-button" style="text-decoration:none;display:inline-block;">
+      Ver todas las licencias
+    </a>
+  </div>
+
+  <div class="filtros-container">
+    <h3>Filtros de búsqueda</h3>
+
+    <div class="filtros-grid">
+      <div class="filtro-grupo">
+        <label for="nombreApellido">Nombre y Apellido</label>
+        <input
+          id="nombreApellido"
+          type="text"
+          [(ngModel)]="nombreApellido"
+          placeholder="Buscar por nombre..."
+        />
+      </div>
+
+      <div class="filtro-grupo">
+        <label for="grupoSanguineo">Grupo Sanguíneo</label>
+        <select id="grupoSanguineo" [(ngModel)]="grupoSanguineo">
+          <option value="">Todos</option>
+          <option *ngFor="let g of gruposSanguineos" [value]="g">{{ g }}</option>
+        </select>
+      </div>
+
+      <div class="filtro-grupo">
+        <label for="factorRH">Factor RH</label>
+        <select id="factorRH" [(ngModel)]="factorRH">
+          <option value="">Todos</option>
+          <option value="POSITIVO">Positivo (+)</option>
+          <option value="NEGATIVO">Negativo (-)</option>
+        </select>
+      </div>
+
+      <div class="filtro-grupo">
+        <label for="donanteOrganos">Donante de Órganos</label>
+        <select id="donanteOrganos" [(ngModel)]="donanteOrganos">
+          <option [ngValue]="undefined">Todos</option>
+          <option [ngValue]="true">Sí</option>
+          <option [ngValue]="false">No</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filtros-acciones">
+      <button class="primary-button" (click)="buscar()">Buscar</button>
+      <button class="secondary-button" (click)="limpiar()">Limpiar</button>
+    </div>
+  </div>
+
+  <div *ngIf="errorMensaje" class="error-mensaje">{{ errorMensaje }}</div>
+
+  <div *ngIf="buscado && licencias.length === 0 && !errorMensaje" class="sin-resultados">
+    No se encontraron licencias vigentes con los criterios seleccionados.
+  </div>
+
+  <table *ngIf="licencias.length > 0" border="1" cellspacing="0" cellpadding="5" style="width:100%;margin-top:20px;">
+    <thead>
+      <tr>
+        <th>Titular</th>
+        <th>Documento</th>
+        <th>Clase</th>
+        <th>Grupo Sanguíneo</th>
+        <th>Factor RH</th>
+        <th>Donante de Órganos</th>
+        <th>Fecha Emisión</th>
+        <th>Vencimiento</th>
+        <th>Vigencia</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let l of licencias">
+        <td>{{ l.titular }}</td>
+        <td>{{ l.numeroDocumento }}</td>
+        <td>{{ l.clase }}</td>
+        <td>{{ l.grupoSanguineo || '-' }}</td>
+        <td>{{ l.factorRH ? formatFactorRH(l.factorRH) : '-' }}</td>
+        <td>{{ l.donanteOrganos ? 'Sí' : 'No' }}</td>
+        <td>{{ l.fechaEmision | date:'dd/MM/yyyy' }}</td>
+        <td>{{ getFechaVencimiento(l) | date:'dd/MM/yyyy' }}</td>
+        <td>{{ l.vigencia }} año/s</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="buscado" style="margin-top:10px;color:#555;">
+    Total: {{ licencias.length }} licencia/s vigente/s
+  </div>
+</div>
