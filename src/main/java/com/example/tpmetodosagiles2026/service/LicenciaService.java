@@ -309,4 +309,18 @@ public class LicenciaService {
                 .orElseThrow(() -> new IllegalArgumentException("Licencia no encontrada con ID: " + id));
     }
 
+    public List<Licencia> listarExpiradas(LocalDate desde, LocalDate hasta) {
+        LocalDate hoy = LocalDate.now();
+        return repository.findAll().stream()
+                .filter(l -> l.getVigencia() != null && l.getFechaEmision() != null)
+                .filter(l -> {
+                    LocalDate vencimiento = l.getFechaEmision().toLocalDate().plusYears(l.getVigencia());
+                    if (!vencimiento.isBefore(hoy)) return false;
+                    if (desde != null && vencimiento.isBefore(desde)) return false;
+                    if (hasta != null && vencimiento.isAfter(hasta)) return false;
+                    return true;
+                })
+                .toList();
+    }
+
 }

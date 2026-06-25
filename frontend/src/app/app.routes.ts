@@ -10,6 +10,7 @@ import { ListaLicenciasVigentesComponent } from './components/lista-licencias-vi
 import { AltaUsuarioComponent } from './components/alta-usuario/alta-usuario.component';
 import { LoginSuperUsuarioComponent } from './components/login-super-usuario/login-super-usuario.component';
 import { superUsuarioGuard } from './guards/super-usuario.guard';
+import { ListadoExpiradasComponent } from './components/listado-expiradas/listado-expiradas.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -22,5 +23,6 @@ export const routes: Routes = [
   { path: 'licencias-vigentes', component: ListaLicenciasVigentesComponent, canActivate: [authGuard] },
   { path: 'login-super', component: LoginSuperUsuarioComponent },
   { path: 'alta-usuario', component: AltaUsuarioComponent, canActivate: [superUsuarioGuard] },
+  { path: 'licencias-expiradas', component: ListadoExpiradasComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: 'login' }
 ];

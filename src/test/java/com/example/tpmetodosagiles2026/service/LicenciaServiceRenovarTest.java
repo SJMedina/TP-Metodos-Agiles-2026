@@ -125,7 +125,6 @@ class LicenciaServiceRenovarTest {
         dto.setRenovarPorVencimiento(false);
 
         when(repository.findById(1L)).thenReturn(Optional.of(licenciaBase));
-        when(costoService.calcularCostoTotal("B", 5)).thenReturn(1500.0);
         when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Licencia resultado = service.renovar(dto);
@@ -143,7 +142,6 @@ class LicenciaServiceRenovarTest {
         dto.setRenovarPorVencimiento(false);
 
         when(repository.findById(1L)).thenReturn(Optional.of(licenciaBase));
-        when(costoService.calcularCostoTotal("B", 5)).thenReturn(1500.0);
         when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Licencia resultado = service.renovar(dto);
@@ -161,7 +159,6 @@ class LicenciaServiceRenovarTest {
         dto.setRenovarPorVencimiento(false);
 
         when(repository.findById(1L)).thenReturn(Optional.of(licenciaBase));
-        when(costoService.calcularCostoTotal("B", 5)).thenReturn(1500.0);
         when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Licencia resultado = service.renovar(dto);
@@ -197,7 +194,6 @@ class LicenciaServiceRenovarTest {
         dto.setRenovarPorVencimiento(false);
 
         when(repository.findById(1L)).thenReturn(Optional.of(licenciaBase));
-        when(costoService.calcularCostoTotal("B", 5)).thenReturn(1500.0);
         when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         // No debe lanzar excepción aunque esté fuera de la ventana

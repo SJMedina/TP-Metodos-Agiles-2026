@@ -1,4 +1,4 @@
-﻿package com.example.tpmetodosagiles2026.config;
+package com.example.tpmetodosagiles2026.config;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

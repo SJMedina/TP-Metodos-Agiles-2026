@@ -63,4 +63,13 @@ public class Licencia {
     private Integer vigencia;
     private Double costo;
     private LocalDate fechaNacimiento;
+
+    public Licencia(String titular, int edad, String clase, String numeroDocumento) {
+        this.titular = titular;
+        this.edad = edad;
+        this.clase = clase;
+        this.numeroDocumento = numeroDocumento;
+        this.donanteOrganos = false;
+        this.vigente = true;
+    }
 }

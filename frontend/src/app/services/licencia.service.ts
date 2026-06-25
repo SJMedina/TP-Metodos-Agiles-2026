@@ -37,4 +37,10 @@ export class LicenciaService {
     if (filtros.donanteOrganos !== undefined) params = params.set('donanteOrganos', String(filtros.donanteOrganos));
     return this.http.get<Licencia[]>(`${this.apiUrl}/vigentes`, { params });
   }
+  listarExpiradas(desde?: string, hasta?: string): Observable<Licencia[]> {
+    let params = new HttpParams();
+    if (desde) params = params.set('desde', desde);
+    if (hasta) params = params.set('hasta', hasta);
+    return this.http.get<Licencia[]>(`${this.apiUrl}/expiradas`, { params });
+  }
 }
