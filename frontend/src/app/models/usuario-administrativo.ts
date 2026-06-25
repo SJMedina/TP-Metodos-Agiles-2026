@@ -9,3 +9,9 @@ export interface CrearUsuarioRequest {
   nombre: string;
   password: string;
 }
+
+export interface ActualizarUsuarioRequest {
+  nombre?: string;
+  password?: string;
+}
+

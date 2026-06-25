@@ -13,21 +13,26 @@ import com.example.tpmetodosagiles2026.model.FactorRH;
 import com.example.tpmetodosagiles2026.model.GrupoSanguineo;
 import com.example.tpmetodosagiles2026.model.Licencia;
 import com.example.tpmetodosagiles2026.model.SuperUsuario;
+import com.example.tpmetodosagiles2026.model.UsuarioAdministrativo;
 import com.example.tpmetodosagiles2026.repository.LicenciaRepository;
 import com.example.tpmetodosagiles2026.repository.SuperUsuarioRepository;
+import com.example.tpmetodosagiles2026.repository.UsuarioAdministrativoRepository;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
 
     private final LicenciaRepository licenciaRepository;
     private final SuperUsuarioRepository superUsuarioRepository;
+    private final UsuarioAdministrativoRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(LicenciaRepository licenciaRepository,
                            SuperUsuarioRepository superUsuarioRepository,
+                           UsuarioAdministrativoRepository usuarioRepository,
                            PasswordEncoder passwordEncoder) {
         this.licenciaRepository = licenciaRepository;
         this.superUsuarioRepository = superUsuarioRepository;
+        this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -36,6 +41,24 @@ public class DataInitializer implements CommandLineRunner {
         if (!superUsuarioRepository.existsById("superadmin")) {
             superUsuarioRepository.save(
                 new SuperUsuario("superadmin", passwordEncoder.encode("super1234"))
+            );
+        }
+
+        if (!usuarioRepository.existsById("emp01")) {
+            usuarioRepository.save(
+                new UsuarioAdministrativo("emp01", "Juan Perez", passwordEncoder.encode("emp123"))
+            );
+        }
+
+        if (!usuarioRepository.existsById("emp02")) {
+            usuarioRepository.save(
+                new UsuarioAdministrativo("emp02", "Maria Garcia", passwordEncoder.encode("emp123"))
+            );
+        }
+
+        if (!usuarioRepository.existsById("emp03")) {
+            usuarioRepository.save(
+                new UsuarioAdministrativo("emp03", "Carlos Lopez", passwordEncoder.encode("emp123"))
             );
         }
 

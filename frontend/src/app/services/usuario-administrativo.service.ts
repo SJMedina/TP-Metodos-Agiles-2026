@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { CrearUsuarioRequest, UsuarioAdministrativo } from '../models/usuario-administrativo';
+import { CrearUsuarioRequest, ActualizarUsuarioRequest, UsuarioAdministrativo } from '../models/usuario-administrativo';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioAdministrativoService {
@@ -15,5 +15,9 @@ export class UsuarioAdministrativoService {
 
   listar(): Observable<UsuarioAdministrativo[]> {
     return this.http.get<UsuarioAdministrativo[]>(this.apiUrl);
+  }
+
+  actualizar(id: string, data: ActualizarUsuarioRequest): Observable<UsuarioAdministrativo> {
+    return this.http.put<UsuarioAdministrativo>(`${this.apiUrl}/${id}`, data);
   }
 }
