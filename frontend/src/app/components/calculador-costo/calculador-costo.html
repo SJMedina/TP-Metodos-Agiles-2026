@@ -1,24 +1,7 @@
 <div class="calculador-shell">
   <div class="calculador-card">
-    <div class="header-row">
-      <div>
-        <h2>Calcular Costo de Licencia</h2>
-        <p class="helper-text">Use la clase seleccionada en el formulario principal y seleccione la vigencia.</p>
-      </div>
-    </div>
-
     <div class="form-group">
-      <label for="clase">Clase de Licencia</label>
-      <select id="clase" [(ngModel)]="claseSeleccionada" (ngModelChange)="actualizarCosto()">
-        <option value="" disabled>Seleccione una clase...</option>
-        <option value="A">Clase A (Ciclomotores, motocicletas y triciclos)</option>
-        <option value="B">Clase B (Automóviles y camionetas con acoplado)</option>
-        <option value="C">Clase C (Camiones sin acoplado)</option>
-        <option value="D">Clase D (Transporte de pasajeros, emergencia o seguridad)</option>
-        <option value="E">Clase E (Camiones articulados o maquinaria especial)</option>
-        <option value="F">Clase F (Automotores adaptados para discapacitados)</option>
-        <option value="G">Clase G (Tractores agrícolas y maquinaria especial agrícola)</option>
-      </select>
+      <p>Clase seleccionada: <strong>{{ claseBase || 'Sin clase seleccionada' }}</strong></p>
     </div>
 
     <div class="form-group">

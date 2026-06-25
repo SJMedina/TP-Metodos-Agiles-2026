@@ -24,11 +24,10 @@ export class CalculadorCostoComponent implements OnChanges {
   protected mensajeCarga: string | null = null;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['claseBase'] && this.claseBase) {
+    if (changes['claseBase']) {
       this.claseSeleccionada = this.claseBase;
       this.actualizarCosto();
     }
-    //Agregado para calcular el costo automaticamente cuando se trata de una renovacion
     if (changes['vigenciaFija'] && this.vigenciaFija) {
       this.vigenciaSeleccionada = this.vigenciaFija;
     }

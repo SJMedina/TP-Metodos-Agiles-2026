@@ -109,3 +109,24 @@
   color: #059669;
   font-size: 16px;
 }
+
+/* Mini-modal styles */
+.modal-backdrop {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.35);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index: 1000;
+}
+.modal-card {
+  background: white;
+  border-radius: 10px;
+  padding: 18px;
+  width: 360px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+}
