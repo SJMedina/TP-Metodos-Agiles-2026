@@ -15,6 +15,9 @@ public class EmitirLicenciaDTO {
     private Boolean tieneLicenciaProfesionalAnterior;
     private Integer vigencia;
     private Double costo;
+    private String grupoSanguineo;
+    private String factorRH;
+    private Boolean donanteOrganos;
 
     // Constructors
     public EmitirLicenciaDTO() {
@@ -66,4 +69,13 @@ public class EmitirLicenciaDTO {
 
     public Double getCosto() { return costo; }
     public void setCosto(Double costo) { this.costo = costo; }
+
+    public String getGrupoSanguineo() { return grupoSanguineo; }
+    public void setGrupoSanguineo(String grupoSanguineo) { this.grupoSanguineo = grupoSanguineo; }
+
+    public String getFactorRH() { return factorRH; }
+    public void setFactorRH(String factorRH) { this.factorRH = factorRH; }
+
+    public Boolean getDonanteOrganos() { return donanteOrganos; }
+    public void setDonanteOrganos(Boolean donanteOrganos) { this.donanteOrganos = donanteOrganos; }
 }

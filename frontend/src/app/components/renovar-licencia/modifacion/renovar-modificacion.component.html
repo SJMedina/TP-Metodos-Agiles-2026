@@ -40,6 +40,24 @@
       <label for="edad">Edad</label>
       <input id="edad" type="number" [value]="calcularEdad(licenciaEditable.fechaNacimiento)" readonly />
 
+      <label for="grupoSanguineo">Grupo Sanguíneo</label>
+      <select id="grupoSanguineo" [(ngModel)]="licenciaEditable.grupoSanguineo">
+        <option value="">Sin especificar</option>
+        <option *ngFor="let g of gruposSanguineos" [value]="g">{{ g }}</option>
+      </select>
+
+      <label for="factorRH">Factor RH</label>
+      <select id="factorRH" [(ngModel)]="licenciaEditable.factorRH">
+        <option value="">Sin especificar</option>
+        <option value="POSITIVO">Positivo (+)</option>
+        <option value="NEGATIVO">Negativo (-)</option>
+      </select>
+
+      <label class="checkbox-label" style="margin-bottom:16px;">
+        <input type="checkbox" [(ngModel)]="licenciaEditable.donanteOrganos" />
+        Donante de órganos
+      </label>
+
       <label for="observaciones">Observaciones / Limitaciones</label>
       <textarea id="observaciones" [(ngModel)]="licenciaEditable.observaciones"
                 placeholder="Observaciones" rows="3"></textarea>

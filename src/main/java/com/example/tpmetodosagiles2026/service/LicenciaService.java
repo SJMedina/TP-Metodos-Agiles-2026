@@ -49,6 +49,11 @@ public class LicenciaService {
         licencia.setClase(dto.getClase());
         licencia.setObservaciones(dto.getObservaciones());
         licencia.setVigencia(dto.getVigencia());
+        if (dto.getGrupoSanguineo() != null && !dto.getGrupoSanguineo().isEmpty())
+            licencia.setGrupoSanguineo(GrupoSanguineo.valueOf(dto.getGrupoSanguineo()));
+        if (dto.getFactorRH() != null && !dto.getFactorRH().isEmpty())
+            licencia.setFactorRH(FactorRH.valueOf(dto.getFactorRH()));
+        licencia.setDonanteOrganos(Boolean.TRUE.equals(dto.getDonanteOrganos()));
         double costoLicencia = costoService.calcularCostoTotal(dto.getClase(), dto.getVigencia());
         licencia.setCosto(costoLicencia);
         licencia.setFechaEmision(LocalDateTime.now());
@@ -73,43 +78,59 @@ public class LicenciaService {
             throw new IllegalArgumentException("La licencia no está vigente y no puede ser renovada");
         }
 
-        validarVigenciaRenovacion(dto.getVigencia());
-
         boolean esPorVencimiento = Boolean.TRUE.equals(dto.getRenovarPorVencimiento());
 
         if (esPorVencimiento) {
+            validarVigenciaRenovacion(dto.getVigencia());
             validarVentanaRenovacion(licenciaActual);
+            return renovarPorVencimiento(licenciaActual, dto);
+        } else {
+            return modificarDatos(licenciaActual, dto);
         }
+    }
 
-        // Marcar la licencia actual como histórica
+    private Licencia renovarPorVencimiento(Licencia licenciaActual, RenovarLicenciaDTO dto) {
         licenciaActual.setVigente(false);
         repository.save(licenciaActual);
 
-        // Crear nueva licencia con los datos actualizados
         Licencia nueva = new Licencia();
         nueva.setNumeroDocumento(licenciaActual.getNumeroDocumento());
         nueva.setClase(licenciaActual.getClase());
         nueva.setGrupoSanguineo(licenciaActual.getGrupoSanguineo());
         nueva.setFactorRH(licenciaActual.getFactorRH());
         nueva.setDonanteOrganos(licenciaActual.getDonanteOrganos());
-        nueva.setTitular(dto.getTitular() != null ? dto.getTitular().trim() : licenciaActual.getTitular());
-        nueva.setEdad(dto.getEdad() != null ? dto.getEdad() : licenciaActual.getEdad());
-        nueva.setFechaNacimiento(dto.getFechaNacimiento() != null ? dto.getFechaNacimiento() : licenciaActual.getFechaNacimiento());
-        nueva.setObservaciones(dto.getObservaciones() != null ? dto.getObservaciones().trim() : licenciaActual.getObservaciones());
+        nueva.setTitular(licenciaActual.getTitular());
+        nueva.setEdad(licenciaActual.getEdad());
+        nueva.setFechaNacimiento(licenciaActual.getFechaNacimiento());
+        nueva.setObservaciones(licenciaActual.getObservaciones());
         nueva.setVigencia(dto.getVigencia());
         nueva.setFechaEmision(LocalDateTime.now());
         nueva.setUsuarioAdministrativo(obtenerUsuarioActual());
         nueva.setVigente(true);
+        nueva.setCosto(costoService.calcularCostoTotal(licenciaActual.getClase(), dto.getVigencia()));
 
-        double costo = costoService.calcularCostoTotal(licenciaActual.getClase(), dto.getVigencia());
-        nueva.setCosto(costo);
-
-        LOGGER.info("Renovando licencia id={} tipo={}", licenciaActual.getId(),
-                esPorVencimiento ? "VENCIMIENTO" : "MODIFICACION_DATOS");
-
+        LOGGER.info("Renovando por vencimiento licencia id={}", licenciaActual.getId());
         Licencia saved = repository.save(nueva);
         repository.flush();
         LOGGER.info("Nueva licencia creada id={} (reemplaza id={})", saved.getId(), licenciaActual.getId());
+        return saved;
+    }
+
+    private Licencia modificarDatos(Licencia licencia, RenovarLicenciaDTO dto) {
+        if (dto.getTitular() != null) licencia.setTitular(dto.getTitular().trim());
+        if (dto.getEdad() != null) licencia.setEdad(dto.getEdad());
+        if (dto.getFechaNacimiento() != null) licencia.setFechaNacimiento(dto.getFechaNacimiento());
+        if (dto.getObservaciones() != null) licencia.setObservaciones(dto.getObservaciones().trim());
+        if (dto.getGrupoSanguineo() != null && !dto.getGrupoSanguineo().isEmpty())
+            licencia.setGrupoSanguineo(GrupoSanguineo.valueOf(dto.getGrupoSanguineo()));
+        if (dto.getFactorRH() != null && !dto.getFactorRH().isEmpty())
+            licencia.setFactorRH(FactorRH.valueOf(dto.getFactorRH()));
+        if (dto.getDonanteOrganos() != null) licencia.setDonanteOrganos(dto.getDonanteOrganos());
+        licencia.setUsuarioAdministrativo(obtenerUsuarioActual());
+
+        LOGGER.info("Modificando datos licencia id={}", licencia.getId());
+        Licencia saved = repository.save(licencia);
+        repository.flush();
         return saved;
     }
 

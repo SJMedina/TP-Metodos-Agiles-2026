@@ -23,6 +23,8 @@ export class RenovarModificacionComponent {
   protected currentUser = '';
   protected buscado = false;
 
+  protected readonly gruposSanguineos = ['A', 'B', 'AB', 'O'];
+
   private licenciaService = inject(LicenciaService);
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -95,7 +97,10 @@ export class RenovarModificacionComponent {
       fechaNacimiento: this.licenciaEditable.fechaNacimiento,
       observaciones: this.licenciaEditable.observaciones,
       vigencia: this.licenciaEditable.vigencia,
-      renovarPorVencimiento: false
+      renovarPorVencimiento: false,
+      grupoSanguineo: this.licenciaEditable.grupoSanguineo || undefined,
+      factorRH: this.licenciaEditable.factorRH || undefined,
+      donanteOrganos: this.licenciaEditable.donanteOrganos ?? false
     };
 
     this.licenciaService.renovarLicencia(payload).subscribe({

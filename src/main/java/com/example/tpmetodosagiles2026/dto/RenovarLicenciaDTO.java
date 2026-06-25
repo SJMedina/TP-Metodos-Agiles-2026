@@ -16,7 +16,10 @@ public class RenovarLicenciaDTO {
     private Integer edad;
     private LocalDate fechaNacimiento;
     private String observaciones;
-    private Integer vigencia;       // nueva vigencia
-    private Boolean renovarPorVencimiento; // true si es por vencimiento, false si es por datos
+    private Integer vigencia;
+    private Boolean renovarPorVencimiento;
+    private String grupoSanguineo;
+    private String factorRH;
+    private Boolean donanteOrganos;
 
 }

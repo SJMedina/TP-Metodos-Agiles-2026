@@ -27,8 +27,14 @@ export class EmitirLicenciasComponent implements OnInit {
     vigencia: 1,
     poseeLicenciaB: false,
     antiguedadLicenciaBEnAnios: 0,
-    tieneLicenciaProfesionalAnterior: false
+    tieneLicenciaProfesionalAnterior: false,
+    grupoSanguineo: '',
+    factorRH: '',
+    donanteOrganos: false
   };
+
+  protected readonly gruposSanguineos = ['A', 'B', 'AB', 'O'];
+  protected readonly factoresRH = ['POSITIVO', 'NEGATIVO'];
 
   protected mensaje: string | null = null;
   protected errorValidacion: string | null = null;
@@ -74,7 +80,10 @@ export class EmitirLicenciasComponent implements OnInit {
       antiguedadLicenciaBEnAnios: this.nuevaLicencia.antiguedadLicenciaBEnAnios,
       tieneLicenciaProfesionalAnterior: this.nuevaLicencia.tieneLicenciaProfesionalAnterior,
       vigencia: this.nuevaLicencia.vigencia,
-      costo: this.costoCalculado
+      costo: this.costoCalculado,
+      grupoSanguineo: this.nuevaLicencia.grupoSanguineo || undefined,
+      factorRH: this.nuevaLicencia.factorRH || undefined,
+      donanteOrganos: this.nuevaLicencia.donanteOrganos ?? false
     };
 
     this.licenciaService.emitirLicencia(payload).subscribe({
@@ -178,7 +187,10 @@ export class EmitirLicenciasComponent implements OnInit {
       vigencia: 1,
       poseeLicenciaB: false,
       antiguedadLicenciaBEnAnios: 0,
-      tieneLicenciaProfesionalAnterior: false
+      tieneLicenciaProfesionalAnterior: false,
+      grupoSanguineo: '',
+      factorRH: '',
+      donanteOrganos: false
     };
     this.errorValidacion = null;
     this.costoCalculado = null;

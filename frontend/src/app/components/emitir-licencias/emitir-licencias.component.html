@@ -33,6 +33,26 @@
       <option value="G">Clase G - Tractores agrícolas y maquinaria especial agrícola</option>
     </select>
 
+    <label for="grupoSanguineo">Grupo Sanguíneo</label>
+    <select id="grupoSanguineo" [(ngModel)]="nuevaLicencia.grupoSanguineo">
+      <option value="">Sin especificar</option>
+      <option *ngFor="let g of gruposSanguineos" [value]="g">{{ g }}</option>
+    </select>
+
+    <label for="factorRH">Factor RH</label>
+    <select id="factorRH" [(ngModel)]="nuevaLicencia.factorRH">
+      <option value="">Sin especificar</option>
+      <option value="POSITIVO">Positivo (+)</option>
+      <option value="NEGATIVO">Negativo (-)</option>
+    </select>
+
+    <div class="toggle-row">
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="nuevaLicencia.donanteOrganos" />
+        Donante de órganos
+      </label>
+    </div>
+
     <label for="observaciones">Observaciones / Limitaciones</label>
     <textarea id="observaciones" [(ngModel)]="nuevaLicencia.observaciones" placeholder="Detalle cualquier limitación u observación" rows="3"></textarea>
 
