@@ -7,6 +7,9 @@ import { RenovarLicenciaComponent } from './components/renovar-licencia/renovar-
 import { RenovarVencimientoComponent } from './components/renovar-licencia/vencimiento/renovar-vencimiento.component';
 import { RenovarModificacionComponent } from './components/renovar-licencia/modifacion/renovar-modificacion.component';
 import { ListaLicenciasVigentesComponent } from './components/lista-licencias-vigentes/lista-licencias-vigentes.component';
+import { AltaUsuarioComponent } from './components/alta-usuario/alta-usuario.component';
+import { LoginSuperUsuarioComponent } from './components/login-super-usuario/login-super-usuario.component';
+import { superUsuarioGuard } from './guards/super-usuario.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -17,5 +20,7 @@ export const routes: Routes = [
   { path: 'renovar-licencia/vencimiento', component: RenovarVencimientoComponent, canActivate: [authGuard] },
   { path: 'renovar-licencia/modificacion', component: RenovarModificacionComponent, canActivate: [authGuard] },
   { path: 'licencias-vigentes', component: ListaLicenciasVigentesComponent, canActivate: [authGuard] },
+  { path: 'login-super', component: LoginSuperUsuarioComponent },
+  { path: 'alta-usuario', component: AltaUsuarioComponent, canActivate: [superUsuarioGuard] },
   { path: '**', redirectTo: 'login' }
 ];
