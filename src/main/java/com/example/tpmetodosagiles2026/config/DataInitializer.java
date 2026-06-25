@@ -42,15 +42,15 @@ public class DataInitializer implements CommandLineRunner {
         if (licenciaRepository.count() > 0) return;
 
         licenciaRepository.saveAll(List.of(
-            crear("Juan Pérez",       "30111222", LocalDate.of(1990, 3, 15), "B", GrupoSanguineo.A,  FactorRH.POSITIVO, true,  5),
-            crear("María García",     "28456789", LocalDate.of(1995, 7, 20), "A", GrupoSanguineo.B,  FactorRH.NEGATIVO, false, 5),
-            crear("Carlos López",     "25789123", LocalDate.of(1988, 11, 5), "C", GrupoSanguineo.AB, FactorRH.POSITIVO, true,  4),
-            crear("Ana Martínez",     "32654321", LocalDate.of(2000, 1, 30), "B", GrupoSanguineo.O,  FactorRH.NEGATIVO, false, 3),
-            crear("Pedro Gómez",      "27333444", LocalDate.of(1985, 6, 10), "D", GrupoSanguineo.A,  FactorRH.NEGATIVO, true,  4),
-            crear("Laura Fernández",  "35987654", LocalDate.of(1998, 9, 25), "B", GrupoSanguineo.O,  FactorRH.POSITIVO, true,  5),
-            crear("Diego Rodríguez",  "22111333", LocalDate.of(1992, 4, 8),  "A", GrupoSanguineo.AB, FactorRH.NEGATIVO, false, 3),
+            crear("Juan Perez",       "30111222", LocalDate.of(1990, 3, 15), "B", GrupoSanguineo.A,  FactorRH.POSITIVO, true,  5),
+            crear("Maria Garcia",     "28456789", LocalDate.of(1995, 7, 20), "A", GrupoSanguineo.B,  FactorRH.NEGATIVO, false, 5),
+            crear("Carlos Lopez",     "25789123", LocalDate.of(1988, 11, 5), "C", GrupoSanguineo.AB, FactorRH.POSITIVO, true,  4),
+            crear("Ana Martinez",     "32654321", LocalDate.of(2000, 1, 30), "B", GrupoSanguineo.O,  FactorRH.NEGATIVO, false, 3),
+            crear("Pedro Gomez",      "27333444", LocalDate.of(1985, 6, 10), "D", GrupoSanguineo.A,  FactorRH.NEGATIVO, true,  4),
+            crear("Laura Fernandez",  "35987654", LocalDate.of(1998, 9, 25), "B", GrupoSanguineo.O,  FactorRH.POSITIVO, true,  5),
+            crear("Diego Rodriguez",  "22111333", LocalDate.of(1992, 4, 8),  "A", GrupoSanguineo.AB, FactorRH.NEGATIVO, false, 3),
             crearConEmision("Roberto Silva",  "40100200", LocalDate.of(1993, 5, 12), "B", GrupoSanguineo.A, FactorRH.POSITIVO, false, 1, LocalDateTime.of(2025, 8,  1, 10, 0)),
-            crearConEmision("Sofía Torres",   "41200300", LocalDate.of(1997, 2, 28), "A", GrupoSanguineo.O, FactorRH.NEGATIVO, true,  3, LocalDateTime.of(2023, 9, 15, 10, 0)),
+            crearConEmision("Sofia Torres",   "41200300", LocalDate.of(1997, 2, 28), "A", GrupoSanguineo.O, FactorRH.NEGATIVO, true,  3, LocalDateTime.of(2023, 9, 15, 10, 0)),
             crearConEmision("Marcos Herrera", "39300400", LocalDate.of(1986, 8, 20), "B", GrupoSanguineo.B, FactorRH.POSITIVO, true,  5, LocalDateTime.of(2021, 11, 1, 10, 0))
         ));
     }
