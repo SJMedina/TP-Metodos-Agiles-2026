@@ -8,6 +8,7 @@
   </div>
 
   <div style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:20px;">
+    <a routerLink="/alta" class="primary-button" style="text-decoration:none;display:inline-block;">Dar de alta a Titular</a>
     <a routerLink="/emitir-licencias" class="primary-button" style="text-decoration:none;display:inline-block;">Emitir Licencia</a>
     <a routerLink="/renovar-licencia" class="primary-button" style="text-decoration:none;display:inline-block;">Renovar Licencia</a>
     <a routerLink="/licencias-vigentes" class="primary-button" style="text-decoration:none;display:inline-block;">Licencias Vigentes</a>
@@ -35,6 +36,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let l of licencias">
+
         <td>{{l.id}}</td>
         <td>{{l.titular}}</td>
         <td>{{l.numeroDocumento}}</td>

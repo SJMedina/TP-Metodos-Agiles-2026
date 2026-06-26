@@ -2,7 +2,7 @@ package com.example.tpmetodosagiles2026.service;
 
 import com.example.tpmetodosagiles2026.model.Licencia;
 import com.lowagie.text.Document;
-import com.lowagie.text.Element;
+
 import com.lowagie.text.Font;
 import com.lowagie.text.FontFactory;
 import com.lowagie.text.Paragraph;
@@ -89,6 +89,9 @@ public class PdfService {
         document.add(clase);
         
         document.add(new Paragraph("Vigencia: " + licencia.getVigencia() + " años", fontNormal));
+        if(licencia.getObservaciones() == null || licencia.getObservaciones().isEmpty()) {
+            licencia.setObservaciones("");
+        }
         document.add(new Paragraph("Observaciones: \n" + licencia.getObservaciones(), fontNormal));
         
         document.close();
