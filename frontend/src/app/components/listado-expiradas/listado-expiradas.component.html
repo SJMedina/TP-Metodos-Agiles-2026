@@ -1,0 +1,72 @@
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Gestión de Licencias</p>
+      <h1>Licencias Expiradas</h1>
+      <p class="subtitle">Listado de licencias cuya fecha de vencimiento es anterior a la fecha actual.</p>
+    </div>
+    <a routerLink="/listar-licencias" class="primary-button" style="text-decoration:none;display:inline-block;">
+      Ver todas las licencias
+    </a>
+  </div>
+
+  <div class="filter-section">
+    <h2 class="filter-title">Filtrar por rango de vencimiento</h2>
+    <div class="filter-row">
+      <div class="filter-field">
+        <label for="fechaDesde">Fecha Desde</label>
+        <input id="fechaDesde" type="date" [(ngModel)]="fechaDesde" />
+      </div>
+      <div class="filter-field">
+        <label for="fechaHasta">Fecha Hasta</label>
+        <input id="fechaHasta" type="date" [(ngModel)]="fechaHasta" />
+      </div>
+      <div class="filter-actions">
+        <button class="primary-button" (click)="buscar()">Buscar / Filtrar</button>
+        <button class="secondary-button" (click)="limpiar()">Limpiar filtros</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="cargando" class="loading">Cargando...</div>
+
+  <div *ngIf="error" class="message error">{{ error }}</div>
+
+  <div *ngIf="!cargando && !error">
+
+    <div *ngIf="licencias.length === 0" class="empty-state">
+      No se encontraron licencias expiradas para los filtros seleccionados.
+    </div>
+
+    <div *ngIf="licencias.length > 0" class="license-list">
+      <p class="result-count">{{ licencias.length }} licencia(s) encontrada(s)</p>
+      <table class="license-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Titular</th>
+            <th>N° Documento</th>
+            <th>Clase</th>
+            <th>Fecha Emisión</th>
+            <th>Vigencia (años)</th>
+            <th>Fecha Vencimiento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let l of licencias">
+            <td>{{ l.id }}</td>
+            <td>{{ l.titular }}</td>
+            <td>{{ l.numeroDocumento }}</td>
+            <td>{{ l.clase }}</td>
+            <td>{{ formatearFechaEmision(l.fechaEmision) }}</td>
+            <td>{{ l.vigencia }}</td>
+            <td class="fecha-vencimiento">{{ calcularFechaVencimiento(l) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>

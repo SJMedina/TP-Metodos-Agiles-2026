@@ -1,0 +1,82 @@
+<div class="page">
+  <div class="header-row">
+    <div>
+      <h1>Emitir Licencia</h1>
+      <p>Use el formulario para completar los datos del titular, las condiciones específicas de clase y el responsable administrativo del trámite.</p>
+      <p class="info">Usuario administrativo actual: {{ currentUser || 'No hay sesión activa' }}</p>
+    </div>
+    <button class="secondary-button" routerLink="/listar-licencias">Volver al listado</button>
+  </div>
+
+  <div class="form-card">
+    <label for="titular">Titular</label>
+    <input id="titular" [(ngModel)]="nuevaLicencia.titular" placeholder="Nombre completo" />
+
+    <label for="documento">Documento</label>
+    <input id="documento" [(ngModel)]="nuevaLicencia.numeroDocumento" placeholder="Documento" />
+
+    <label for="fechaNacimiento">Fecha de nacimiento</label>
+    <input id="fechaNacimiento" type="date" [(ngModel)]="nuevaLicencia.fechaNacimiento" />
+
+    <label for="edad">Edad</label>
+    <input id="edad" type="number" [value]="calcularEdad(nuevaLicencia.fechaNacimiento)" readonly />
+
+    <label for="clase">Clase</label>
+    <select id="clase" [(ngModel)]="nuevaLicencia.clase">
+      <option value="" disabled selected>Seleccione una clase...</option>
+      <option value="A">Clase A - Ciclomotores, motocicletas y triciclos motorizados</option>
+      <option value="B">Clase B - Automóviles y camionetas con acoplado</option>
+      <option value="C">Clase C - Camiones sin acoplado</option>
+      <option value="D">Clase D - Servicio de transporte de pasajeros, emergencia, seguridad</option>
+      <option value="E">Clase E - Camiones articulados o con acoplado, maquinaria especial</option>
+      <option value="F">Clase F - Automotores adaptados para discapacitados</option>
+      <option value="G">Clase G - Tractores agrícolas y maquinaria especial agrícola</option>
+    </select>
+
+    <label for="grupoSanguineo">Grupo Sanguíneo</label>
+    <select id="grupoSanguineo" [(ngModel)]="nuevaLicencia.grupoSanguineo">
+      <option value="">Sin especificar</option>
+      <option *ngFor="let g of gruposSanguineos" [value]="g">{{ g }}</option>
+    </select>
+
+    <label for="factorRH">Factor RH</label>
+    <select id="factorRH" [(ngModel)]="nuevaLicencia.factorRH">
+      <option value="">Sin especificar</option>
+      <option value="POSITIVO">Positivo (+)</option>
+      <option value="NEGATIVO">Negativo (-)</option>
+    </select>
+
+    <div class="toggle-row">
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="nuevaLicencia.donanteOrganos" />
+        Donante de órganos
+      </label>
+    </div>
+
+    <label for="observaciones">Observaciones / Limitaciones</label>
+    <textarea id="observaciones" [(ngModel)]="nuevaLicencia.observaciones" placeholder="Detalle cualquier limitación u observación" rows="3"></textarea>
+
+    <div *ngIf="['C','D','E'].includes(nuevaLicencia.clase ? nuevaLicencia.clase.toUpperCase() : '')" class="toggle-row">
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="nuevaLicencia.poseeLicenciaB" />
+        Posee licencia B anterior
+      </label>
+      <label class="short-input">
+        Antigüedad de licencia B
+        <input type="number" min="0" [(ngModel)]="nuevaLicencia.antiguedadLicenciaBEnAnios" placeholder="Años" />
+      </label>
+    </div>
+
+    <div class="calculador-page-section">
+      <app-calculador-costo [claseBase]="nuevaLicencia.clase" (costoEmitido)="handleCostoCalculado($event)"></app-calculador-costo>
+    </div>
+
+    <div *ngIf="errorValidacion" class="message error">{{ errorValidacion }}</div>
+    <div *ngIf="mensaje" class="message success">{{ mensaje }}</div>
+    <div *ngIf="costoCalculado !== null" class="message info">Costo seleccionado: ${{ costoCalculado }}</div>
+
+    <div class="actions">
+      <button class="primary-button" (click)="emitirLicencia()">Emitir licencia</button>
+    </div>
+  </div>
+</div>

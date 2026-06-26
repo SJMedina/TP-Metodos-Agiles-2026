@@ -1,0 +1,26 @@
+<div class="calculador-shell">
+  <div class="calculador-card">
+    <div class="form-group">
+      <p>Clase seleccionada: <strong>{{ claseBase || 'Sin clase seleccionada' }}</strong></p>
+    </div>
+
+    <div class="form-group">
+      <label for="vigencia">Vigencia de la Licencia</label>
+      <select id="vigencia" [(ngModel)]="vigenciaSeleccionada" (ngModelChange)="actualizarCosto()">
+        <option [ngValue]="null" disabled>Seleccione la vigencia...</option>
+        <option [ngValue]="1">1 Año</option>
+        <option [ngValue]="3">3 Años</option>
+        <option [ngValue]="4">4 Años</option>
+        <option [ngValue]="5">5 Años</option>
+      </select>
+    </div>
+
+    <div class="costo-card">
+      <label for="costoTotal">Costo Total (incluye $8 de gastos administrativos)</label>
+      <input type="text" id="costoTotal" [value]="costoCalculado !== null ? '$' + costoCalculado : 'Esperando datos...'" readonly />
+    </div>
+
+    <div *ngIf="mensajeCarga" class="message error">{{ mensajeCarga }}</div>
+  </div>
+</div>
+

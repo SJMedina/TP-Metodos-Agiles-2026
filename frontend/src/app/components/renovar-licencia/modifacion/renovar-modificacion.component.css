@@ -1,0 +1,188 @@
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  color: #064e3b;
+}
+.header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 20px;
+}
+.header-row h1 {
+  margin: 0 0 8px;
+}
+.header-row p {
+  margin: 0;
+  color: #14532d;
+}
+.form-card {
+  background: #ffffff;
+  border: 1px solid #d1fae5;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 18px 30px rgba(15, 23, 42, 0.06);
+  margin-bottom: 16px;
+}
+.form-card label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 700;
+  color: #065f46;
+}
+.form-card input,
+.form-card select,
+.form-card textarea {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  background: #f0fdf4;
+  color: #0f172a;
+  box-sizing: border-box;
+}
+.form-card input[readonly] {
+  background: #e5e7eb;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.primary-button,
+.secondary-button {
+  border: none;
+  border-radius: 14px;
+  padding: 14px 22px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1rem;
+}
+.primary-button {
+  background: #16a34a;
+  color: #ffffff;
+}
+.primary-button:hover {
+  background: #15803d;
+}
+.secondary-button {
+  background: #d1fae5;
+  color: #0f5132;
+}
+.secondary-button:hover {
+  background: #a7f3d0;
+}
+.message {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-weight: 600;
+}
+.message.error {
+  background: #fef2f2;
+  color: #991b1b;
+}
+.message.success {
+  background: #ecfdf5;
+  color: #065f46;
+}
+.message.info {
+  background: #f0fdf4;
+  color: #065f46;
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 95, 70, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 1000;
+}
+.modal-card {
+  width: min(760px, 100%);
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.17);
+  position: relative;
+  padding: 28px;
+}
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  background: #16a34a;
+  color: white;
+  cursor: pointer;
+}
+
+/* Tarjetas de licencia seleccionables */
+.licencia-card {
+  cursor: pointer;
+  margin-top: 0.75rem;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+.licencia-card:hover {
+  border-color: #86efac;
+}
+.licencia-card.seleccionada {
+  border-color: #16a34a;
+}
+.licencia-card p {
+  margin: 4px 0;
+}
+
+/* Selector de tipo de renovación (página inicial) */
+.opciones-renovacion {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+.opcion-card {
+  flex: 1;
+  padding: 2rem;
+  border-radius: 18px;
+  border: 2px solid #d1fae5;
+  background: #ffffff;
+  cursor: pointer;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #064e3b;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+  transition: border-color 0.2s, background 0.2s;
+}
+.opcion-card:hover {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+.opcion-card p {
+  font-size: 0.85rem;
+  font-weight: 400;
+  margin-top: 0.5rem;
+  color: #14532d;
+}
+
+/* Info vigencia */
+.vigencia-info {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-top: 1rem;
+  color: #065f46;
+  font-weight: 600;
+}

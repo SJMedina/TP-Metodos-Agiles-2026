@@ -1,13 +1,19 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router'; // 1. IMPORTANTE: Debes importar esto
+import { Component, signal } from '@angular/core';
+import { RouterOutlet,RouterLink, RouterLinkActive } from '@angular/router'; 
+
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet], // 2. IMPORTANTE: Debes agregarlo dentro de los corchetes
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
-  styleUrls: ['./app.css']
+  styleUrls: ['./app.css'],
+  styles: [`
+    .active-link {
+      background: rgba(255,255,255,0.2) !important;
+    }
+  `]
 })
-export class AppComponent {
-  title = 'frontend';
+export class App {
+  protected readonly title = signal('TP-Metodos-Agiles-2026');
 }
