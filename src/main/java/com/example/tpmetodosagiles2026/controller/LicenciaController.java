@@ -84,6 +84,26 @@ public class LicenciaController {
         return ResponseEntity.ok(service.listarVigentes(nombreApellido, grupoSanguineo, factorRH, donanteOrganos));
     }
 
+    @PutMapping("/renovar-datos")
+    public ResponseEntity<?> renovarConDatosActualizados(@RequestBody RenovarLicenciaDTO dto) {
+        try {
+            return ResponseEntity.ok(service.renovarConDatosActualizados(dto));
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    @GetMapping("/historial")
+    public ResponseEntity<List<Licencia>> listarHistorial(
+            @RequestParam(required = false) String nombreApellido,
+            @RequestParam(required = false) String grupoSanguineo,
+            @RequestParam(required = false) String factorRH,
+            @RequestParam(required = false) Boolean donanteOrganos) {
+        return ResponseEntity.ok(service.listarHistorial(nombreApellido, grupoSanguineo, factorRH, donanteOrganos));
+    }
+
     @GetMapping
     public ResponseEntity<List<Licencia>> listar() {
         return ResponseEntity.ok(service.listar());

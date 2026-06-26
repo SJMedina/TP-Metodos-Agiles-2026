@@ -18,6 +18,9 @@ export class RenovarModificacionComponent {
   protected documento: string = '';
   protected licencias: Licencia[] = [];
   protected licenciaEditable: Licencia | null = null;
+  // Nombre y apellido por separado; el sistema guarda el titular como "Apellido, Nombre".
+  protected nombre = '';
+  protected apellido = '';
   protected mensaje: string | null = null;
   protected errorValidacion: string | null = null;
   protected currentUser = '';
@@ -65,6 +68,15 @@ export class RenovarModificacionComponent {
   protected seleccionarLicencia(licencia: Licencia): void {
     // Copia para no mutar el original hasta confirmar
     this.licenciaEditable = { ...licencia };
+    // Separar el titular ("Apellido, Nombre") en dos campos editables.
+    const partes = (licencia.titular || '').split(',');
+    if (partes.length >= 2) {
+      this.apellido = partes[0].trim();
+      this.nombre = partes.slice(1).join(',').trim();
+    } else {
+      this.apellido = (licencia.titular || '').trim();
+      this.nombre = '';
+    }
     this.errorValidacion = null;
     this.mensaje = null;
   }
@@ -85,14 +97,14 @@ export class RenovarModificacionComponent {
 
     if (!this.licenciaEditable) return;
 
-    if (!this.licenciaEditable.titular?.trim()) {
-      this.errorValidacion = 'El titular es obligatorio.';
+    if (!this.nombre.trim() || !this.apellido.trim()) {
+      this.errorValidacion = 'El nombre/s y el apellido/s son obligatorios.';
       return;
     }
 
     const payload = {
       id: this.licenciaEditable.id,
-      titular: this.licenciaEditable.titular,
+      titular: `${this.apellido.trim()}, ${this.nombre.trim()}`,
       edad: this.calcularEdad(this.licenciaEditable.fechaNacimiento),
       fechaNacimiento: this.licenciaEditable.fechaNacimiento,
       observaciones: this.licenciaEditable.observaciones,

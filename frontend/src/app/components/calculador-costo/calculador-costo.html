@@ -4,16 +4,8 @@
       <p>Clase seleccionada: <strong>{{ claseBase || 'Sin clase seleccionada' }}</strong></p>
     </div>
 
-    <div class="form-group">
-      <label for="vigencia">Vigencia de la Licencia</label>
-      <select id="vigencia" [(ngModel)]="vigenciaSeleccionada" (ngModelChange)="actualizarCosto()">
-        <option [ngValue]="null" disabled>Seleccione la vigencia...</option>
-        <option [ngValue]="1">1 Año</option>
-        <option [ngValue]="3">3 Años</option>
-        <option [ngValue]="4">4 Años</option>
-        <option [ngValue]="5">5 Años</option>
-      </select>
-    </div>
+    <!-- La vigencia se determina automáticamente según la edad y se muestra en el
+         formulario principal; acá solo se calcula el costo a partir de ella. -->
 
     <div class="costo-card">
       <label for="costoTotal">Costo Total (incluye $8 de gastos administrativos)</label>

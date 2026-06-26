@@ -28,18 +28,44 @@ export class LicenciaService {
     return this.http.get<Licencia[]>(`${this.apiUrl}/${documento}`);
   }
 
+  obtenerPorDocumentoYClase(documento: string, clase: string): Observable<Licencia> {
+    return this.http.get<Licencia>(`${this.apiUrl}/documento/${documento}/clase/${clase}`);
+  }
+
+  renovarDatos(payload: any): Observable<Licencia> {
+    return this.http.put<Licencia>(`${this.apiUrl}/renovar-datos`, payload);
+  }
+
   listarVigentes(filtros: {
     nombreApellido?: string;
     grupoSanguineo?: string;
     factorRH?: string;
     donanteOrganos?: boolean;
   }): Observable<Licencia[]> {
+    return this.http.get<Licencia[]>(`${this.apiUrl}/vigentes`, { params: this.armarFiltros(filtros) });
+  }
+
+  listarHistorial(filtros: {
+    nombreApellido?: string;
+    grupoSanguineo?: string;
+    factorRH?: string;
+    donanteOrganos?: boolean;
+  }): Observable<Licencia[]> {
+    return this.http.get<Licencia[]>(`${this.apiUrl}/historial`, { params: this.armarFiltros(filtros) });
+  }
+
+  private armarFiltros(filtros: {
+    nombreApellido?: string;
+    grupoSanguineo?: string;
+    factorRH?: string;
+    donanteOrganos?: boolean;
+  }): HttpParams {
     let params = new HttpParams();
     if (filtros.nombreApellido) params = params.set('nombreApellido', filtros.nombreApellido);
     if (filtros.grupoSanguineo) params = params.set('grupoSanguineo', filtros.grupoSanguineo);
     if (filtros.factorRH) params = params.set('factorRH', filtros.factorRH);
     if (filtros.donanteOrganos !== undefined) params = params.set('donanteOrganos', String(filtros.donanteOrganos));
-    return this.http.get<Licencia[]>(`${this.apiUrl}/vigentes`, { params });
+    return params;
   }
   listarExpiradas(desde?: string, hasta?: string): Observable<Licencia[]> {
     let params = new HttpParams();

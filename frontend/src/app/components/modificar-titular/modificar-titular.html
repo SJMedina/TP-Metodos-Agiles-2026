@@ -1,8 +1,11 @@
 <div class="alta-container">
   <div class="form-card">
     <div class="card-header">
-      <h2>Modificar Titular</h2>
-      <p>Actualice los datos personales de un titular.</p>
+      <div class="card-header-text">
+        <h2>Modificar Titular</h2>
+        <p>Actualice los datos personales de un titular.</p>
+      </div>
+      <button type="button" class="secondary-button" routerLink="/listar-licencias">Volver al listado</button>
     </div>
 
     <form [formGroup]="titularForm" (ngSubmit)="onSubmit()" class="form-body">
@@ -32,7 +35,7 @@
         </div>
 
         <div class="form-group">
-          <label for="nombre">Nombre <span class="required">*</span></label>
+          <label for="nombre">Nombre/s <span class="required">*</span></label>
           <input type="text" id="nombre" formControlName="nombre" placeholder="Ej: Juan">
           <span class="error-text" *ngIf="titularForm.get('nombre')?.invalid && titularForm.get('nombre')?.touched">
             El nombre es requerido.
@@ -40,7 +43,7 @@
         </div>
 
         <div class="form-group">
-          <label for="apellido">Apellido <span class="required">*</span></label>
+          <label for="apellido">Apellido/s <span class="required">*</span></label>
           <input type="text" id="apellido" formControlName="apellido" placeholder="Ej: Pérez">
           <span class="error-text" *ngIf="titularForm.get('apellido')?.invalid && titularForm.get('apellido')?.touched">
             El apellido es requerido.
@@ -137,20 +140,28 @@
         </div>
 
         <div class="form-group">
-          <label for="grupoSanguineo">Grupo y Factor <span class="required">*</span></label>
+          <label for="grupoSanguineo">Grupo Sanguíneo <span class="required">*</span></label>
           <select id="grupoSanguineo" formControlName="grupoSanguineo">
             <option value="" disabled selected>Seleccione...</option>
-            <option value="A+">A+</option>
-            <option value="A-">A-</option>
-            <option value="B+">B+</option>
-            <option value="B-">B-</option>
-            <option value="AB+">AB+</option>
-            <option value="AB-">AB-</option>
-            <option value="0+">0+</option>
-            <option value="0-">0-</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="AB">AB</option>
+            <option value="O">O</option>
           </select>
           <span class="error-text" *ngIf="titularForm.get('grupoSanguineo')?.invalid && titularForm.get('grupoSanguineo')?.touched">
             El grupo sanguíneo es requerido.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="factorRH">Factor RH <span class="required">*</span></label>
+          <select id="factorRH" formControlName="factorRH">
+            <option value="" disabled selected>Seleccione...</option>
+            <option value="POSITIVO">Positivo (+)</option>
+            <option value="NEGATIVO">Negativo (-)</option>
+          </select>
+          <span class="error-text" *ngIf="titularForm.get('factorRH')?.invalid && titularForm.get('factorRH')?.touched">
+            El factor RH es requerido.
           </span>
         </div>
       </div>
@@ -163,14 +174,32 @@
         </label>
       </div>
 
+      <!-- Renovación de licencia con los datos actualizados y su costo -->
+      <ng-container *ngIf="licenciaId">
+        <hr class="divider">
+        <h3 class="section-title">Renovar licencia (clase {{ claseLicencia }})</h3>
+        <p style="color:#475569;margin:0 0 1rem;">
+          Puede renovar la licencia vigente del titular con los datos actualizados. El costo se calcula automáticamente.
+        </p>
+        <app-calculador-costo
+          [claseBase]="claseLicencia"
+          [vigenciaFija]="vigenciaAutomatica"
+          (costoEmitido)="handleCostoCalculado($event)">
+        </app-calculador-costo>
+      </ng-container>
+
+      <div *ngIf="!licenciaId" style="margin-top:1rem;color:#475569;">
+        El titular no tiene una licencia vigente para renovar.
+      </div>
+
       <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end;">
-        <button type="button" class="btn-secondary" (click)="onSubmit(true)" [disabled]="titularForm.invalid" style="background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
+        <button *ngIf="licenciaId" type="button" class="btn-secondary" (click)="onSubmit(true)" [disabled]="titularForm.invalid" style="background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">
           Guardar y Renovar Licencia
         </button>
-        
+
         <button type="button" class="btn-submit" [disabled]="titularForm.invalid" (click)="onSubmit(false)">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-          Solo Guardar
+          Guardar cambios
         </button>
       </div>
 

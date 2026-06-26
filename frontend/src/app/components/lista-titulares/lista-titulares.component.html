@@ -1,0 +1,48 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Gestión de Titulares</p>
+      <h1>Listado de Titulares</h1>
+      <p class="subtitle">Seleccione un titular para modificar sus datos.</p>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <a routerLink="/alta" class="primary-button" style="text-decoration:none;">Dar de alta titular</a>
+      <a routerLink="/listar-licencias" class="secondary-button" style="text-decoration:none;">Volver al listado</a>
+    </div>
+  </div>
+
+  <div *ngIf="cargando" class="loading">Cargando...</div>
+  <div *ngIf="error" class="message error">{{ error }}</div>
+
+  <div *ngIf="!cargando && !error">
+    <div *ngIf="titulares.length === 0" class="empty-state">
+      No hay titulares registrados.
+    </div>
+
+    <table *ngIf="titulares.length > 0" class="titular-table">
+      <thead>
+        <tr>
+          <th>Documento</th>
+          <th>Apellido y Nombre</th>
+          <th>Clase</th>
+          <th>Grupo / RH</th>
+          <th>Donante</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of titulares">
+          <td>{{ t.tipoDocumento }} {{ t.numeroDocumento }}</td>
+          <td>{{ t.apellido }}, {{ t.nombre }}</td>
+          <td>{{ t.claseSolicitada }}</td>
+          <td>{{ t.grupoSanguineo }} {{ t.factorRH === 'POSITIVO' ? '(+)' : (t.factorRH === 'NEGATIVO' ? '(-)' : '') }}</td>
+          <td>{{ t.donanteOrganos ? 'Sí' : 'No' }}</td>
+          <td>
+            <a [routerLink]="['/modificar-titular', t.id]" class="primary-button"
+               style="text-decoration:none;padding:6px 14px;font-size:0.9em;">Modificar</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

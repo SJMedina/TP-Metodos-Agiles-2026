@@ -14,6 +14,7 @@ import { LoginSuperUsuarioComponent } from './components/login-super-usuario/log
 import { ModificarUsuarioComponent } from './components/modificar-usuario/modificar-usuario.component';
 import { superUsuarioGuard } from './guards/super-usuario.guard';
 import { ListadoExpiradasComponent } from './components/listado-expiradas/listado-expiradas.component';
+import { ListaTitularesComponent } from './components/lista-titulares/lista-titulares.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -29,6 +30,7 @@ export const routes: Routes = [
   { path: 'licencias-expiradas', component: ListadoExpiradasComponent, canActivate: [authGuard] },
   { path: 'modificar-usuario', component: ModificarUsuarioComponent, canActivate: [authGuard] },
   { path: 'alta', component: AltaTitularComponent },
+  { path: 'listar-titulares', component: ListaTitularesComponent, canActivate: [authGuard] },
   { path: 'modificar-titular/:id', component: ModificarTitularComponent },
   { path: '**', redirectTo: 'login' }
 ];

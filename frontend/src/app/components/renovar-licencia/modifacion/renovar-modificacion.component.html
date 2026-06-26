@@ -31,8 +31,11 @@
 
     <!-- Formulario de edición -->
     <div *ngIf="licenciaEditable" style="margin-top: 1.5rem;">
-      <label for="titular">Titular</label>
-      <input id="titular" [(ngModel)]="licenciaEditable.titular" placeholder="Nombre completo" />
+      <label for="nombre">Nombre/s</label>
+      <input id="nombre" [(ngModel)]="nombre" placeholder="Nombre/s" />
+
+      <label for="apellido">Apellido/s</label>
+      <input id="apellido" [(ngModel)]="apellido" placeholder="Apellido/s" />
 
       <label for="fechaNacimiento">Fecha de nacimiento</label>
       <input id="fechaNacimiento" type="date" [(ngModel)]="licenciaEditable.fechaNacimiento" />

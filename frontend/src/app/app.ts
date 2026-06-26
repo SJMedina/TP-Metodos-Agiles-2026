@@ -1,18 +1,13 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet,RouterLink, RouterLinkActive } from '@angular/router'; 
+import { RouterOutlet } from '@angular/router';
 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
-  styleUrls: ['./app.css'],
-  styles: [`
-    .active-link {
-      background: rgba(255,255,255,0.2) !important;
-    }
-  `]
+  styleUrls: ['./app.css']
 })
 export class App {
   protected readonly title = signal('TP-Metodos-Agiles-2026');

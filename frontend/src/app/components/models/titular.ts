@@ -9,6 +9,7 @@ export interface Titular {
   fechaNacimiento: string; 
   direccion: Direccion; // <-- Ahora usa la interfaz Direccion
   claseSolicitada: string;
-  grupoSanguineo: string;
+  grupoSanguineo: string;   // A, B, AB, O
+  factorRH: string;         // POSITIVO, NEGATIVO
   donanteOrganos: boolean;
 }

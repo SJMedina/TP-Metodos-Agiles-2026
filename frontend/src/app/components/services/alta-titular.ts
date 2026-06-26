@@ -23,4 +23,8 @@ export class TitularService {
   buscarPorId(id: number): Observable<Titular> {
     return this.http.get<Titular>(`${this.apiUrl}/${id}`);
   }
+
+  listarTitulares(): Observable<Titular[]> {
+    return this.http.get<Titular[]>(this.apiUrl);
+  }
 }

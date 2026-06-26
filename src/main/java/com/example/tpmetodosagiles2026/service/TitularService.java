@@ -49,6 +49,10 @@ public class TitularService {
         return titularRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el titular con ID: " + id));
     }
+
+    public java.util.List<Titular> listarTitulares() {
+        return titularRepository.findAll();
+    }
     
     public Titular modificarTitular(Long id, Titular datosActualizados) {
         
@@ -58,6 +62,7 @@ public class TitularService {
         titularActual.setNombre(datosActualizados.getNombre());
         titularActual.setApellido(datosActualizados.getApellido());
         titularActual.setGrupoSanguineo(datosActualizados.getGrupoSanguineo());
+        titularActual.setFactorRH(datosActualizados.getFactorRH());
         titularActual.setDonanteOrganos(datosActualizados.getDonanteOrganos());
 
         if (datosActualizados.getDireccion() != null) {

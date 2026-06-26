@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { TitularService } from '../services/alta-titular';
 
 @Component({
   selector: 'app-alta-titular',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule], 
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './alta-titular.html',
   styleUrls: ['./alta-titular.css']
 })
@@ -29,6 +30,7 @@ export class AltaTitularComponent implements OnInit {
       fechaNacimiento: ['', [Validators.required, this.edadMinimaValidator(18)]],
       claseSolicitada: ['', Validators.required],
       grupoSanguineo: ['', Validators.required],
+      factorRH: ['', Validators.required],
       donanteOrganos: [false, Validators.required],
       
       // Regla 1: Sub-formulario (FormGroup anidado) para la Dirección

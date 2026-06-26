@@ -57,6 +57,11 @@ export class ListadoExpiradasComponent implements OnInit {
   }
 
   calcularFechaVencimiento(licencia: Licencia): string {
+    // Usa la fecha de vencimiento guardada (la misma con la que filtra el backend).
+    // Para registros antiguos sin ese dato, cae a fechaEmisión + vigencia.
+    if (licencia.fechaVencimiento) {
+      return this.formatearFecha(licencia.fechaVencimiento);
+    }
     if (!licencia.fechaEmision || !licencia.vigencia) return 'N/D';
     try {
       const emision = licencia.fechaEmision as unknown;
@@ -72,6 +77,27 @@ export class ListadoExpiradasComponent implements OnInit {
       return fecha.toLocaleDateString('es-AR');
     } catch {
       return 'N/D';
+    }
+  }
+
+  private formatearFecha(valor: unknown): string {
+    try {
+      if (Array.isArray(valor)) {
+        // Jackson puede serializar LocalDate como array [año, mes, día]
+        const [anio, mes, dia] = valor as number[];
+        return new Date(anio, mes - 1, dia).toLocaleDateString('es-AR');
+      }
+      const texto = String(valor);
+      // Fecha ISO 'YYYY-MM-DD' (con o sin hora): parsear en horario local para evitar
+      // el desfase de un día que produce new Date() al interpretar como UTC.
+      const match = texto.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (match) {
+        const [, anio, mes, dia] = match;
+        return new Date(+anio, +mes - 1, +dia).toLocaleDateString('es-AR');
+      }
+      return new Date(texto).toLocaleDateString('es-AR');
+    } catch {
+      return String(valor);
     }
   }
 

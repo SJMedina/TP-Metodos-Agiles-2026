@@ -1,17 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { ModificarTitular } from './modificar-titular';
+import { ModificarTitularComponent } from './modificar-titular';
 
-describe('ModificarTitular', () => {
-  let component: ModificarTitular;
-  let fixture: ComponentFixture<ModificarTitular>;
+describe('ModificarTitularComponent', () => {
+  let component: ModificarTitularComponent;
+  let fixture: ComponentFixture<ModificarTitularComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModificarTitular],
+      imports: [ModificarTitularComponent],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ModificarTitular);
+    fixture = TestBed.createComponent(ModificarTitularComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

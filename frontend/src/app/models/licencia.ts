@@ -8,6 +8,7 @@ export interface Licencia {
   observaciones?: string;
   usuarioAdministrativo?: string;
   fechaEmision?: string;
+  fechaVencimiento?: string;
   costo?: number;
   vigencia?: number;
   vigente?: boolean;

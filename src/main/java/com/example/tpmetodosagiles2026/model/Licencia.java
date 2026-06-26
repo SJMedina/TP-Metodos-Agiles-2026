@@ -63,6 +63,7 @@ public class Licencia {
     private Integer vigencia;
     private Double costo;
     private LocalDate fechaNacimiento;
+    private LocalDate fechaVencimiento;
 
     public Licencia(String titular, int edad, String clase, String numeroDocumento) {
         this.titular = titular;

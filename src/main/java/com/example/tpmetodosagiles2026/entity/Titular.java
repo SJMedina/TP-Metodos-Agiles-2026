@@ -33,18 +33,21 @@ public class Titular {
     // Clase solicitada (A, B, C, D, E, F, G)
     private String claseSolicitada; 
     
-    // Ejemplo: "A+", "O-", etc.
-    private String grupoSanguineo; 
-    
+    // Grupo sanguíneo: A, B, AB, O
+    private String grupoSanguineo;
+
+    // Factor RH: POSITIVO, NEGATIVO
+    private String factorRH;
+
     // true = SI, false = NO
-    private Boolean donanteOrganos; 
+    private Boolean donanteOrganos;
 
     public Titular() {
     }
 
     public Titular(Long id, String tipoDocumento, String numeroDocumento, String apellido, String nombre,
             LocalDate fechaNacimiento, Direccion direccion, String claseSolicitada, String grupoSanguineo,
-            Boolean donanteOrganos) {
+            String factorRH, Boolean donanteOrganos) {
         this.id = id;
         this.tipoDocumento = tipoDocumento;
         this.numeroDocumento = numeroDocumento;
@@ -54,6 +57,7 @@ public class Titular {
         this.direccion = direccion;
         this.claseSolicitada = claseSolicitada;
         this.grupoSanguineo = grupoSanguineo;
+        this.factorRH = factorRH;
         this.donanteOrganos = donanteOrganos;
     }
 
@@ -127,6 +131,14 @@ public class Titular {
 
     public void setGrupoSanguineo(String grupoSanguineo) {
         this.grupoSanguineo = grupoSanguineo;
+    }
+
+    public String getFactorRH() {
+        return factorRH;
+    }
+
+    public void setFactorRH(String factorRH) {
+        this.factorRH = factorRH;
     }
 
     public Boolean getDonanteOrganos() {

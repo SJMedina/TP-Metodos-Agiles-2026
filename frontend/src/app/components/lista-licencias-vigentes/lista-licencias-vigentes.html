@@ -1,9 +1,20 @@
 <div class="page">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-    <h1>Listado de Licencias Vigentes</h1>
-    <a routerLink="/listar-licencias" class="primary-button" style="text-decoration:none;display:inline-block;">
-      Ver todas las licencias
+    <h1>{{ tab === 'vigentes' ? 'Listado de Licencias Vigentes' : 'Historial de Licencias' }}</h1>
+    <a routerLink="/listar-licencias" class="secondary-button" style="text-decoration:none;display:inline-block;">
+      Volver al listado
     </a>
+  </div>
+
+  <div class="tabs" style="display:flex;gap:8px;margin-bottom:16px;">
+    <button type="button"
+            [class.tab-active]="tab === 'vigentes'"
+            [class.tab-inactive]="tab !== 'vigentes'"
+            (click)="cambiarTab('vigentes')">Vigentes</button>
+    <button type="button"
+            [class.tab-active]="tab === 'historial'"
+            [class.tab-inactive]="tab !== 'historial'"
+            (click)="cambiarTab('historial')">Historial (no vigentes)</button>
   </div>
 
   <div class="filtros-container">
@@ -56,7 +67,7 @@
   <div *ngIf="errorMensaje" class="error-mensaje">{{ errorMensaje }}</div>
 
   <div *ngIf="buscado && licencias.length === 0 && !errorMensaje" class="sin-resultados">
-    No se encontraron licencias vigentes con los criterios seleccionados.
+    No se encontraron licencias {{ tab === 'vigentes' ? 'vigentes' : 'en el historial' }} con los criterios seleccionados.
   </div>
 
   <table *ngIf="licencias.length > 0" border="1" cellspacing="0" cellpadding="5" style="width:100%;margin-top:20px;">
@@ -71,6 +82,7 @@
         <th>Fecha Emisión</th>
         <th>Vencimiento</th>
         <th>Vigencia</th>
+        <th>Estado</th>
       </tr>
     </thead>
     <tbody>
@@ -84,11 +96,17 @@
         <td>{{ l.fechaEmision | date:'dd/MM/yyyy' }}</td>
         <td>{{ getFechaVencimiento(l) | date:'dd/MM/yyyy' }}</td>
         <td>{{ l.vigencia }} año/s</td>
+        <td>
+          <span [class.badge-vigente]="!estaVencida(l) && l.vigente"
+                [class.badge-historial]="estaVencida(l) || !l.vigente">
+            {{ estadoLicencia(l) }}
+          </span>
+        </td>
       </tr>
     </tbody>
   </table>
 
   <div *ngIf="buscado" style="margin-top:10px;color:#555;">
-    Total: {{ licencias.length }} licencia/s vigente/s
+    Total: {{ licencias.length }} licencia/s {{ tab === 'vigentes' ? 'vigente/s' : 'en historial' }}
   </div>
 </div>

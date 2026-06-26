@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,22 @@ public class LicenciaService {
         normalizarCampos(dto);
         validarEdadContraFechaNacimiento(dto);
         validarPorClase(dto);
-        validarVigencia(dto);
+
+        // Invariante: a lo sumo una licencia vigente por titular (documento) y clase.
+        // Si ya existe una vigente para ese documento+clase, se archiva (vigente=false)
+        // para conservar el historial y poder auditar el sistema.
+        repository.findByNumeroDocumentoAndClaseAndVigenteTrue(dto.getNumeroDocumento(), dto.getClase())
+                .ifPresent(anterior -> {
+                    anterior.setVigente(false);
+                    repository.save(anterior);
+                    LOGGER.info("Archivando licencia vigente previa id={} documento={} clase={}",
+                            anterior.getId(), anterior.getNumeroDocumento(), anterior.getClase());
+                });
+
+        // La vigencia se determina automáticamente según la edad del titular.
+        boolean esPrimeraVez = repository.findByNumeroDocumento(dto.getNumeroDocumento()).isEmpty();
+        int vigencia = calcularVigenciaPorEdad(dto.getEdad(), esPrimeraVez);
+        LocalDate inicio = LocalDate.now();
 
         Licencia licencia = new Licencia();
         licencia.setTitular(dto.getTitular());
@@ -48,15 +64,17 @@ public class LicenciaService {
         licencia.setFechaNacimiento(dto.getFechaNacimiento());
         licencia.setClase(dto.getClase());
         licencia.setObservaciones(dto.getObservaciones());
-        licencia.setVigencia(dto.getVigencia());
+        licencia.setVigencia(vigencia);
+        licencia.setFechaVencimiento(calcularFechaVencimiento(dto.getFechaNacimiento(), inicio, vigencia));
         if (dto.getGrupoSanguineo() != null && !dto.getGrupoSanguineo().isEmpty())
             licencia.setGrupoSanguineo(GrupoSanguineo.valueOf(dto.getGrupoSanguineo()));
         if (dto.getFactorRH() != null && !dto.getFactorRH().isEmpty())
             licencia.setFactorRH(FactorRH.valueOf(dto.getFactorRH()));
         licencia.setDonanteOrganos(Boolean.TRUE.equals(dto.getDonanteOrganos()));
-        double costoLicencia = costoService.calcularCostoTotal(dto.getClase(), dto.getVigencia());
+        double costoLicencia = costoService.calcularCostoTotal(dto.getClase(), vigencia);
         licencia.setCosto(costoLicencia);
         licencia.setFechaEmision(LocalDateTime.now());
+        licencia.setVigente(true);
         licencia.setUsuarioAdministrativo(obtenerUsuarioActual());
 
         LOGGER.info("Persisting licencia for documento={} clase={} usuario={}", dto.getNumeroDocumento(),
@@ -105,6 +123,8 @@ public class LicenciaService {
         nueva.setObservaciones(licenciaActual.getObservaciones());
         nueva.setVigencia(dto.getVigencia());
         nueva.setFechaEmision(LocalDateTime.now());
+        nueva.setFechaVencimiento(
+                calcularFechaVencimiento(licenciaActual.getFechaNacimiento(), LocalDate.now(), dto.getVigencia()));
         nueva.setUsuarioAdministrativo(obtenerUsuarioActual());
         nueva.setVigente(true);
         nueva.setCosto(costoService.calcularCostoTotal(licenciaActual.getClase(), dto.getVigencia()));
@@ -134,6 +154,45 @@ public class LicenciaService {
         return saved;
     }
 
+    @Transactional
+    public Licencia renovarConDatosActualizados(RenovarLicenciaDTO dto) {
+        Licencia actual = repository.findById(dto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("No existe una licencia con id=" + dto.getId()));
+        if (!Boolean.TRUE.equals(actual.getVigente())) {
+            throw new IllegalArgumentException("La licencia no está vigente y no puede renovarse");
+        }
+
+        actual.setVigente(false);
+        repository.save(actual);
+
+        int vigencia = calcularVigenciaPorEdad(actual.getEdad(), false); // ya tuvo licencia
+        LocalDate inicio = LocalDate.now();
+
+        Licencia nueva = new Licencia();
+        nueva.setNumeroDocumento(actual.getNumeroDocumento());
+        nueva.setClase(actual.getClase());
+        nueva.setFechaNacimiento(actual.getFechaNacimiento());
+        nueva.setEdad(actual.getEdad());
+        nueva.setObservaciones(actual.getObservaciones());
+        nueva.setTitular(dto.getTitular() != null ? dto.getTitular().trim() : actual.getTitular());
+        nueva.setGrupoSanguineo(dto.getGrupoSanguineo() != null && !dto.getGrupoSanguineo().isEmpty()
+                ? GrupoSanguineo.valueOf(dto.getGrupoSanguineo()) : actual.getGrupoSanguineo());
+        nueva.setFactorRH(dto.getFactorRH() != null && !dto.getFactorRH().isEmpty()
+                ? FactorRH.valueOf(dto.getFactorRH()) : actual.getFactorRH());
+        nueva.setDonanteOrganos(dto.getDonanteOrganos() != null ? dto.getDonanteOrganos() : actual.getDonanteOrganos());
+        nueva.setVigencia(vigencia);
+        nueva.setFechaEmision(LocalDateTime.now());
+        nueva.setFechaVencimiento(calcularFechaVencimiento(actual.getFechaNacimiento(), inicio, vigencia));
+        nueva.setUsuarioAdministrativo(obtenerUsuarioActual());
+        nueva.setVigente(true);
+        nueva.setCosto(costoService.calcularCostoTotal(actual.getClase(), vigencia));
+
+        LOGGER.info("Renovando con datos actualizados licencia id={} -> nueva", actual.getId());
+        Licencia saved = repository.save(nueva);
+        repository.flush();
+        return saved;
+    }
+
     private void validarVigenciaRenovacion(Integer vigencia) {
         if (vigencia == null) {
             throw new IllegalArgumentException("La vigencia es obligatoria para la renovacion");
@@ -145,9 +204,7 @@ public class LicenciaService {
 
     private void validarVentanaRenovacion(Licencia licencia) {
 
-        LocalDate fechaVencimiento = licencia.getFechaEmision()
-                .toLocalDate()
-                .plusYears(licencia.getVigencia());
+        LocalDate fechaVencimiento = obtenerFechaVencimiento(licencia);
 
         LocalDate hoy = LocalDate.now();
         LocalDate unMesAntes = fechaVencimiento.minusMonths(1);
@@ -187,16 +244,47 @@ public class LicenciaService {
         if (dto.getFechaNacimiento() == null) {
             throw new IllegalArgumentException("La fecha de nacimiento es obligatoria");
         }
-        if (dto.getVigencia() == null) {
-            throw new IllegalArgumentException("La vigencia es obligatoria");
-        }
+        // La vigencia ya no es obligatoria en el request: se determina automáticamente según la edad.
     }
 
-    private void validarVigencia(EmitirLicenciaDTO dto) {
-        int vigencia = dto.getVigencia();
-        if (vigencia != 1 && vigencia != 3 && vigencia != 4 && vigencia != 5) {
-            throw new IllegalArgumentException("La vigencia debe ser 1, 3, 4 o 5 anos");
-        }
+    /**
+     * Determina la vigencia (en años) según la edad del titular:
+     * - Menores de 21: 1 año la primera vez, 3 años las siguientes
+     * - Hasta 46 años: 5 años
+     * - Hasta 60 años: 4 años
+     * - Hasta 70 años: 3 años
+     * - Mayores de 70: 1 año
+     */
+    private int calcularVigenciaPorEdad(int edad, boolean esPrimeraVez) {
+        if (edad < 21) return esPrimeraVez ? 1 : 3;
+        if (edad <= 46) return 5;
+        if (edad <= 60) return 4;
+        if (edad <= 70) return 3;
+        return 1;
+    }
+
+    /**
+     * El día y mes del vencimiento coinciden con la fecha de nacimiento, y la
+     * vigencia se cuenta completa a partir de la fecha de inicio (hoy): el
+     * vencimiento es el primer cumpleaños en o posterior a (inicio + vigencia años).
+     * (withYear ajusta automáticamente el 29/02 a 28/02 en años no bisiestos)
+     */
+    private LocalDate calcularFechaVencimiento(LocalDate fechaNacimiento, LocalDate inicio, int vigencia) {
+        LocalDate base = inicio.plusYears(vigencia);
+        LocalDate cumpleEnBase = fechaNacimiento.withYear(base.getYear());
+        return cumpleEnBase.isBefore(base)
+                ? fechaNacimiento.withYear(base.getYear() + 1)
+                : cumpleEnBase;
+    }
+
+    /**
+     * Fecha de vencimiento de una licencia ya persistida. Usa el campo almacenado
+     * y, para registros antiguos sin fechaVencimiento, cae al cálculo fechaEmisión + vigencia.
+     */
+    private LocalDate obtenerFechaVencimiento(Licencia l) {
+        return l.getFechaVencimiento() != null
+                ? l.getFechaVencimiento()
+                : l.getFechaEmision().toLocalDate().plusYears(l.getVigencia());
     }
 
     private void normalizarCampos(EmitirLicenciaDTO dto) {
@@ -281,6 +369,32 @@ public class LicenciaService {
     }
 
     public List<Licencia> listarVigentes(String nombreApellido, String grupoSanguineo, String factorRH, Boolean donanteOrganos) {
+        // Vigente = registro activo (no reemplazado) y además no vencida.
+        return filtrarLicencias(repository.findByVigenteTrue(), nombreApellido, grupoSanguineo, factorRH, donanteOrganos)
+                .stream()
+                .filter(l -> !estaExpirada(l))
+                .collect(Collectors.toList());
+    }
+
+    public List<Licencia> listarHistorial(String nombreApellido, String grupoSanguineo, String factorRH, Boolean donanteOrganos) {
+        // Historial = reemplazadas (vigente=false) + las activas que ya vencieron.
+        Stream<Licencia> reemplazadas = filtrarLicencias(
+                repository.findByVigenteFalse(), nombreApellido, grupoSanguineo, factorRH, donanteOrganos).stream();
+        Stream<Licencia> vencidas = filtrarLicencias(
+                repository.findByVigenteTrue(), nombreApellido, grupoSanguineo, factorRH, donanteOrganos).stream()
+                .filter(this::estaExpirada);
+        return Stream.concat(reemplazadas, vencidas).collect(Collectors.toList());
+    }
+
+    private boolean estaExpirada(Licencia l) {
+        if (l.getVigencia() == null || l.getFechaEmision() == null) {
+            return false;
+        }
+        return obtenerFechaVencimiento(l).isBefore(LocalDate.now());
+    }
+
+    private List<Licencia> filtrarLicencias(List<Licencia> base, String nombreApellido, String grupoSanguineo,
+            String factorRH, Boolean donanteOrganos) {
         GrupoSanguineo gs = (grupoSanguineo != null && !grupoSanguineo.isEmpty())
                 ? GrupoSanguineo.valueOf(grupoSanguineo) : null;
         FactorRH frh = (factorRH != null && !factorRH.isEmpty())
@@ -288,7 +402,7 @@ public class LicenciaService {
         String nombre = (nombreApellido != null && !nombreApellido.trim().isEmpty())
                 ? nombreApellido.trim().toLowerCase() : null;
 
-        return repository.findByVigenteTrue().stream()
+        return base.stream()
                 .filter(l -> nombre == null || l.getTitular().toLowerCase().contains(nombre))
                 .filter(l -> gs == null || gs.equals(l.getGrupoSanguineo()))
                 .filter(l -> frh == null || frh.equals(l.getFactorRH()))
@@ -314,7 +428,7 @@ public class LicenciaService {
         return repository.findAll().stream()
                 .filter(l -> l.getVigencia() != null && l.getFechaEmision() != null)
                 .filter(l -> {
-                    LocalDate vencimiento = l.getFechaEmision().toLocalDate().plusYears(l.getVigencia());
+                    LocalDate vencimiento = obtenerFechaVencimiento(l);
                     if (!vencimiento.isBefore(hoy)) return false;
                     if (desde != null && vencimiento.isBefore(desde)) return false;
                     if (hasta != null && vencimiento.isAfter(hasta)) return false;

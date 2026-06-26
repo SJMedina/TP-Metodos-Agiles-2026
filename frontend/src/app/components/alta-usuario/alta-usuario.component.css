@@ -12,7 +12,7 @@
   border-radius: 8px;
   padding: 2rem;
   width: 100%;
-  max-width: 480px;
+  max-width: 600px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -22,10 +22,77 @@ h1 {
   color: #1a1a2e;
 }
 
+h3 {
+  font-size: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
 p {
   color: #666;
   margin-bottom: 1.5rem;
   font-size: 0.95rem;
+}
+
+.loading,
+.empty-message {
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+}
+
+.usuarios-list {
+  margin-bottom: 1.5rem;
+}
+
+.usuarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.usuario-item {
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.usuario-item:hover {
+  border-color: #4a90e2;
+  background-color: #f0f5ff;
+}
+
+.usuario-item.selected {
+  border-color: #4a90e2;
+  background-color: #e8f1ff;
+}
+
+.usuario-id {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #4a90e2;
+}
+
+.usuario-nombre {
+  font-size: 0.9rem;
+  color: #333;
+  margin-top: 0.25rem;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  background-color: #f9fafb;
+  border-radius: 4px;
+  margin-bottom: 1rem;
 }
 
 form {
@@ -114,4 +181,18 @@ input:focus {
   background-color: #eafaf1;
   color: #1e8449;
   border: 1px solid #a9dfbf;
+}
+
+@media (max-width: 600px) {
+  .form-card {
+    padding: 1.5rem;
+  }
+
+  .usuarios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+  }
 }

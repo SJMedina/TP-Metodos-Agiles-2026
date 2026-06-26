@@ -1,8 +1,11 @@
 <div class="alta-container">
   <div class="form-card">
     <div class="card-header">
-      <h2>Alta de Titular</h2>
-      <p>Complete los datos requeridos para registrar un nuevo titular en el sistema.</p>
+      <div class="card-header-text">
+        <h2>Alta de Titular</h2>
+        <p>Complete los datos requeridos para registrar un nuevo titular en el sistema.</p>
+      </div>
+      <button type="button" class="secondary-button" routerLink="/listar-licencias">Volver al listado</button>
     </div>
 
     <form [formGroup]="titularForm" (ngSubmit)="onSubmit()" class="form-body">
@@ -32,7 +35,7 @@
         </div>
 
         <div class="form-group">
-          <label for="nombre">Nombre <span class="required">*</span></label>
+          <label for="nombre">Nombre/s <span class="required">*</span></label>
           <input type="text" id="nombre" formControlName="nombre" placeholder="Ej: Juan">
           <span class="error-text" *ngIf="titularForm.get('nombre')?.invalid && titularForm.get('nombre')?.touched">
             El nombre es requerido.
@@ -40,7 +43,7 @@
         </div>
 
         <div class="form-group">
-          <label for="apellido">Apellido <span class="required">*</span></label>
+          <label for="apellido">Apellido/s <span class="required">*</span></label>
           <input type="text" id="apellido" formControlName="apellido" placeholder="Ej: Pérez">
           <span class="error-text" *ngIf="titularForm.get('apellido')?.invalid && titularForm.get('apellido')?.touched">
             El apellido es requerido.
@@ -137,20 +140,28 @@
         </div>
 
         <div class="form-group">
-          <label for="grupoSanguineo">Grupo y Factor <span class="required">*</span></label>
+          <label for="grupoSanguineo">Grupo Sanguíneo <span class="required">*</span></label>
           <select id="grupoSanguineo" formControlName="grupoSanguineo">
             <option value="" disabled selected>Seleccione...</option>
-            <option value="A+">A+</option>
-            <option value="A-">A-</option>
-            <option value="B+">B+</option>
-            <option value="B-">B-</option>
-            <option value="AB+">AB+</option>
-            <option value="AB-">AB-</option>
-            <option value="0+">0+</option>
-            <option value="0-">0-</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="AB">AB</option>
+            <option value="O">O</option>
           </select>
           <span class="error-text" *ngIf="titularForm.get('grupoSanguineo')?.invalid && titularForm.get('grupoSanguineo')?.touched">
             El grupo sanguíneo es requerido.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="factorRH">Factor RH <span class="required">*</span></label>
+          <select id="factorRH" formControlName="factorRH">
+            <option value="" disabled selected>Seleccione...</option>
+            <option value="POSITIVO">Positivo (+)</option>
+            <option value="NEGATIVO">Negativo (-)</option>
+          </select>
+          <span class="error-text" *ngIf="titularForm.get('factorRH')?.invalid && titularForm.get('factorRH')?.touched">
+            El factor RH es requerido.
           </span>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -33,6 +33,10 @@ export class EmitirLicenciasComponent implements OnInit {
     donanteOrganos: false
   };
 
+  // Nombre y apellido por separado; se combinan en "Apellido, Nombre" al emitir.
+  protected nombre = '';
+  protected apellido = '';
+
   protected readonly gruposSanguineos = ['A', 'B', 'AB', 'O'];
   protected readonly factoresRH = ['POSITIVO', 'NEGATIVO'];
 
@@ -41,9 +45,14 @@ export class EmitirLicenciasComponent implements OnInit {
   protected costoCalculado: number | null = null;
   protected currentUser = '';
 
+  // Vigencia determinada automáticamente según la edad (regla de negocio).
+  protected vigenciaAutomatica: number | null = null;
+  protected fechaVencimientoCalculada: string | null = null;
+
   private licenciaService = inject(LicenciaService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     const user = this.authService.getUser();
@@ -69,7 +78,7 @@ export class EmitirLicenciasComponent implements OnInit {
     }
 
     const payload = {
-      titular: this.nuevaLicencia.titular,
+      titular: `${this.apellido.trim()}, ${this.nombre.trim()}`,
       edad,
       numeroDocumento: this.nuevaLicencia.numeroDocumento,
       fechaNacimiento: this.nuevaLicencia.fechaNacimiento,
@@ -104,10 +113,80 @@ export class EmitirLicenciasComponent implements OnInit {
     this.mensaje = `Costo calculado: $${event.costo}.`;
   }
 
+  /**
+   * Determina la vigencia (en años) según la edad del titular:
+   * - Menores de 21: 1 año la primera vez, 3 años las siguientes
+   * - Hasta 46: 5 años | Hasta 60: 4 años | Hasta 70: 3 años | Mayores de 70: 1 año
+   */
+  protected calcularVigenciaPorEdad(edad: number, esPrimeraVez: boolean): number {
+    if (edad < 21) return esPrimeraVez ? 1 : 3;
+    if (edad <= 46) return 5;
+    if (edad <= 60) return 4;
+    if (edad <= 70) return 3;
+    return 1;
+  }
+
+  /**
+   * Recalcula la vigencia automática a partir de la edad y de si el titular ya
+   * posee licencias (consultando por documento). También calcula la fecha de
+   * vencimiento (cumpleaños en el año emisión + vigencia).
+   */
+  protected actualizarVigencia(): void {
+    const documento = this.nuevaLicencia.numeroDocumento?.trim();
+    const fechaNacimiento = this.nuevaLicencia.fechaNacimiento;
+
+    if (!fechaNacimiento) {
+      this.vigenciaAutomatica = null;
+      this.fechaVencimientoCalculada = null;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const edad = this.calcularEdad(fechaNacimiento);
+    if (!edad || Number.isNaN(edad)) {
+      this.vigenciaAutomatica = null;
+      this.fechaVencimientoCalculada = null;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    // Apenas hay fecha de nacimiento (edad) se calcula la vigencia. Sin documento se
+    // asume primera vez; al ingresar el documento se refina (1 vs 3 años para <21).
+    if (!documento) {
+      this.aplicarVigencia(edad, fechaNacimiento, true);
+      return;
+    }
+
+    this.licenciaService.listarPorDocumento(documento).subscribe({
+      next: (licencias) => this.aplicarVigencia(edad, fechaNacimiento, (licencias?.length ?? 0) === 0),
+      // Ante un error de consulta, asumimos primera vez para no bloquear el trámite.
+      error: () => this.aplicarVigencia(edad, fechaNacimiento, true)
+    });
+  }
+
+  private aplicarVigencia(edad: number, fechaNacimiento: string, esPrimeraVez: boolean): void {
+    const vigencia = this.calcularVigenciaPorEdad(edad, esPrimeraVez);
+    this.vigenciaAutomatica = vigencia;
+    this.nuevaLicencia.vigencia = vigencia;
+
+    // El vencimiento cuenta la vigencia completa desde hoy y cae en el cumpleaños:
+    // primer cumpleaños en o posterior a (hoy + vigencia años).
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    const base = new Date(hoy);
+    base.setFullYear(hoy.getFullYear() + vigencia);
+    const venc = new Date(base.getFullYear(), nacimiento.getMonth(), nacimiento.getDate());
+    if (venc < base) {
+      venc.setFullYear(base.getFullYear() + 1);
+    }
+    this.fechaVencimientoCalculada = venc.toLocaleDateString('es-AR');
+    this.cdr.detectChanges();
+  }
+
   private validarFormulario(): boolean {
     const licencia = this.nuevaLicencia;
 
-    if (!licencia.titular?.trim() || !licencia.numeroDocumento?.trim() || !licencia.clase || !licencia.fechaNacimiento) {
+    if (!this.nombre.trim() || !this.apellido.trim() || !licencia.numeroDocumento?.trim() || !licencia.clase || !licencia.fechaNacimiento) {
       this.errorValidacion = 'Complete todos los campos obligatorios antes de emitir la licencia.';
       return false;
     }
@@ -179,6 +258,8 @@ export class EmitirLicenciasComponent implements OnInit {
       factorRH: '',
       donanteOrganos: false
     };
+    this.nombre = '';
+    this.apellido = '';
     this.errorValidacion = null;
     this.costoCalculado = null;
   }

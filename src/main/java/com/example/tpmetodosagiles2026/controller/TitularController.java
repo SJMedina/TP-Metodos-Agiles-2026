@@ -40,6 +40,11 @@ public class TitularController {
         }
     }
 
+    @GetMapping
+    public ResponseEntity<java.util.List<Titular>> listarTitulares() {
+        return ResponseEntity.ok(titularService.listarTitulares());
+    }
+
     // Endpoint para obtener los datos de un titular específico (Soluciona el error 405)
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarTitularPorId(@PathVariable Long id) {
