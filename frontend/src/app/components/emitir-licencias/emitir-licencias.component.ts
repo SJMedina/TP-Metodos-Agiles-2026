@@ -6,6 +6,8 @@ import { CalculadorCostoComponent } from '../calculador-costo/calculador-costo';
 import { LicenciaService } from '../../services/licencia.service';
 import { Licencia } from '../../models/licencia';
 import { AuthService } from '../../auth.service';
+import { TitularService } from '../services/alta-titular';
+import { Titular } from '../models/titular';
 
 @Component({
   selector: 'app-emitir-licencias',
@@ -37,6 +39,13 @@ export class EmitirLicenciasComponent implements OnInit {
   protected nombre = '';
   protected apellido = '';
 
+  // Buscador de titulares: solo se puede emitir para una persona dada de alta.
+  // Se cargan todos los titulares y se filtran en el navegador mientras se escribe.
+  protected titulares: Titular[] = [];
+  protected filtroTitular = '';
+  protected titularSeleccionado: Titular | null = null;
+  protected mostrarSugerencias = false;
+
   protected readonly gruposSanguineos = ['A', 'B', 'AB', 'O'];
   protected readonly factoresRH = ['POSITIVO', 'NEGATIVO'];
 
@@ -51,12 +60,65 @@ export class EmitirLicenciasComponent implements OnInit {
 
   private licenciaService = inject(LicenciaService);
   private authService = inject(AuthService);
+  private titularService = inject(TitularService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     const user = this.authService.getUser();
     this.currentUser = user?.username || '';
+
+    this.titularService.listarTitulares().subscribe({
+      next: (titulares) => (this.titulares = titulares ?? []),
+      error: (err) => console.error('No se pudieron cargar los titulares:', err)
+    });
+  }
+
+  /** Titulares que coinciden con el texto del buscador (nombre, apellido o documento). */
+  protected get titularesFiltrados(): Titular[] {
+    const filtro = this.filtroTitular.trim().toLowerCase();
+    if (!filtro) {
+      return [];
+    }
+    return this.titulares.filter((t) =>
+      `${t.apellido} ${t.nombre} ${t.numeroDocumento}`.toLowerCase().includes(filtro)
+    );
+  }
+
+  /** Autocompleta y bloquea los datos personales a partir del titular elegido. */
+  protected seleccionarTitular(titular: Titular): void {
+    this.titularSeleccionado = titular;
+    this.mostrarSugerencias = false;
+    this.filtroTitular = `${titular.apellido}, ${titular.nombre} — DNI ${titular.numeroDocumento}`;
+
+    this.nombre = titular.nombre;
+    this.apellido = titular.apellido;
+    this.nuevaLicencia.numeroDocumento = titular.numeroDocumento;
+    this.nuevaLicencia.fechaNacimiento = titular.fechaNacimiento;
+    this.nuevaLicencia.grupoSanguineo = titular.grupoSanguineo || '';
+    this.nuevaLicencia.factorRH = titular.factorRH || '';
+    this.nuevaLicencia.donanteOrganos = titular.donanteOrganos ?? false;
+    // La clase solicitada se precarga pero queda editable (ver notas de diseño).
+    this.nuevaLicencia.clase = titular.claseSolicitada || '';
+
+    this.actualizarVigencia();
+  }
+
+  /** Deshace la selección para poder buscar otro titular. */
+  protected limpiarTitular(): void {
+    this.titularSeleccionado = null;
+    this.filtroTitular = '';
+    this.mostrarSugerencias = false;
+    this.nombre = '';
+    this.apellido = '';
+    this.nuevaLicencia.numeroDocumento = '';
+    this.nuevaLicencia.fechaNacimiento = '';
+    this.nuevaLicencia.grupoSanguineo = '';
+    this.nuevaLicencia.factorRH = '';
+    this.nuevaLicencia.donanteOrganos = false;
+    this.nuevaLicencia.clase = '';
+    this.vigenciaAutomatica = null;
+    this.fechaVencimientoCalculada = null;
   }
 
   protected emitirLicencia(): void {
@@ -186,6 +248,11 @@ export class EmitirLicenciasComponent implements OnInit {
   private validarFormulario(): boolean {
     const licencia = this.nuevaLicencia;
 
+    if (this.titularSeleccionado === null) {
+      this.errorValidacion = 'Debe seleccionar un titular dado de alta para emitir la licencia.';
+      return false;
+    }
+
     if (!this.nombre.trim() || !this.apellido.trim() || !licencia.numeroDocumento?.trim() || !licencia.clase || !licencia.fechaNacimiento) {
       this.errorValidacion = 'Complete todos los campos obligatorios antes de emitir la licencia.';
       return false;
@@ -260,6 +327,9 @@ export class EmitirLicenciasComponent implements OnInit {
     };
     this.nombre = '';
     this.apellido = '';
+    this.titularSeleccionado = null;
+    this.filtroTitular = '';
+    this.mostrarSugerencias = false;
     this.errorValidacion = null;
     this.costoCalculado = null;
   }

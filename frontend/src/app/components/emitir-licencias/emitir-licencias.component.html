@@ -9,17 +9,41 @@
   </div>
 
   <div class="form-card">
+    <label for="titular">Titular</label>
+    <div class="titular-buscador">
+      <input id="titular" [(ngModel)]="filtroTitular"
+             (ngModelChange)="mostrarSugerencias = true; titularSeleccionado = null"
+             (focus)="mostrarSugerencias = true"
+             placeholder="Buscar por nombre, apellido o DNI..."
+             autocomplete="off" />
+
+      <ul *ngIf="mostrarSugerencias && filtroTitular.trim()" class="titular-sugerencias">
+        <li *ngFor="let t of titularesFiltrados" (click)="seleccionarTitular(t)">
+          {{ t.apellido }}, {{ t.nombre }} — DNI {{ t.numeroDocumento }}
+        </li>
+        <li *ngIf="titularesFiltrados.length === 0" class="sin-resultados">Sin resultados</li>
+      </ul>
+    </div>
+
+    <p *ngIf="titulares.length === 0" class="info">
+      No hay titulares registrados. <a routerLink="/alta">Dé de alta un titular</a> antes de emitir una licencia.
+    </p>
+    <p *ngIf="titularSeleccionado" class="info">
+      Titular seleccionado: {{ titularSeleccionado.apellido }}, {{ titularSeleccionado.nombre }}.
+      <a href="javascript:void(0)" (click)="limpiarTitular()">Limpiar selección</a>
+    </p>
+
     <label for="nombre">Nombre/s</label>
-    <input id="nombre" [(ngModel)]="nombre" placeholder="Nombre/s" />
+    <input id="nombre" [(ngModel)]="nombre" placeholder="Nombre/s" readonly />
 
     <label for="apellido">Apellido/s</label>
-    <input id="apellido" [(ngModel)]="apellido" placeholder="Apellido/s" />
+    <input id="apellido" [(ngModel)]="apellido" placeholder="Apellido/s" readonly />
 
     <label for="documento">Documento</label>
-    <input id="documento" [(ngModel)]="nuevaLicencia.numeroDocumento" (ngModelChange)="actualizarVigencia()" placeholder="Documento" />
+    <input id="documento" [(ngModel)]="nuevaLicencia.numeroDocumento" placeholder="Documento" readonly />
 
     <label for="fechaNacimiento">Fecha de nacimiento</label>
-    <input id="fechaNacimiento" type="date" [(ngModel)]="nuevaLicencia.fechaNacimiento" (ngModelChange)="actualizarVigencia()" />
+    <input id="fechaNacimiento" type="date" [(ngModel)]="nuevaLicencia.fechaNacimiento" readonly />
 
     <label for="edad">Edad</label>
     <input id="edad" type="number" [value]="calcularEdad(nuevaLicencia.fechaNacimiento)" readonly />
@@ -44,13 +68,13 @@
     </select>
 
     <label for="grupoSanguineo">Grupo Sanguíneo</label>
-    <select id="grupoSanguineo" [(ngModel)]="nuevaLicencia.grupoSanguineo">
+    <select id="grupoSanguineo" [(ngModel)]="nuevaLicencia.grupoSanguineo" [disabled]="true">
       <option value="">Sin especificar</option>
       <option *ngFor="let g of gruposSanguineos" [value]="g">{{ g }}</option>
     </select>
 
     <label for="factorRH">Factor RH</label>
-    <select id="factorRH" [(ngModel)]="nuevaLicencia.factorRH">
+    <select id="factorRH" [(ngModel)]="nuevaLicencia.factorRH" [disabled]="true">
       <option value="">Sin especificar</option>
       <option value="POSITIVO">Positivo (+)</option>
       <option value="NEGATIVO">Negativo (-)</option>
@@ -58,7 +82,7 @@
 
     <div class="toggle-row">
       <label class="checkbox-label">
-        <input type="checkbox" [(ngModel)]="nuevaLicencia.donanteOrganos" />
+        <input type="checkbox" [(ngModel)]="nuevaLicencia.donanteOrganos" [disabled]="true" />
         Donante de órganos
       </label>
     </div>

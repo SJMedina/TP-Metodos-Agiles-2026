@@ -20,6 +20,7 @@ import com.example.tpmetodosagiles2026.model.FactorRH;
 import com.example.tpmetodosagiles2026.model.GrupoSanguineo;
 import com.example.tpmetodosagiles2026.model.Licencia;
 import com.example.tpmetodosagiles2026.repository.LicenciaRepository;
+import com.example.tpmetodosagiles2026.repository.TitularRepository;
 
 @Service
 public class LicenciaService {
@@ -28,29 +29,36 @@ public class LicenciaService {
 
     private final LicenciaRepository repository;
     private final LicenciaCostoService costoService;
+    private final TitularRepository titularRepository;
 
-    public LicenciaService(LicenciaRepository repository, LicenciaCostoService costoService) {
+    public LicenciaService(LicenciaRepository repository, LicenciaCostoService costoService,
+            TitularRepository titularRepository) {
         this.repository = repository;
         this.costoService = costoService;
+        this.titularRepository = titularRepository;
     }
 
     @Transactional
     public Licencia emitir(EmitirLicenciaDTO dto) {
         validarCamposObligatorios(dto);
         normalizarCampos(dto);
+        // La persona debe haber sido dada de alta como titular antes de emitir la licencia.
+        if (!titularRepository.existsByNumeroDocumento(dto.getNumeroDocumento())) {
+            throw new IllegalArgumentException(
+                    "No existe un titular dado de alta con ese documento. Debe darse de alta antes de emitir la licencia.");
+        }
         validarEdadContraFechaNacimiento(dto);
         validarPorClase(dto);
 
-        // Invariante: a lo sumo una licencia vigente por titular (documento) y clase.
-        // Si ya existe una vigente para ese documento+clase, se archiva (vigente=false)
-        // para conservar el historial y poder auditar el sistema.
-        repository.findByNumeroDocumentoAndClaseAndVigenteTrue(dto.getNumeroDocumento(), dto.getClase())
-                .ifPresent(anterior -> {
-                    anterior.setVigente(false);
-                    repository.save(anterior);
-                    LOGGER.info("Archivando licencia vigente previa id={} documento={} clase={}",
-                            anterior.getId(), anterior.getNumeroDocumento(), anterior.getClase());
-                });
+        // Invariante: a lo sumo una licencia vigente por titular (documento).
+        // Al emitir, se archivan todas las vigentes previas de la persona (cualquier clase)
+        // para que solo cuente la nueva con los datos actualizados; se conserva el historial.
+        for (Licencia anterior : repository.findByNumeroDocumentoAndVigenteTrue(dto.getNumeroDocumento())) {
+            anterior.setVigente(false);
+            repository.save(anterior);
+            LOGGER.info("Archivando licencia vigente previa id={} documento={} clase={}",
+                    anterior.getId(), anterior.getNumeroDocumento(), anterior.getClase());
+        }
 
         // La vigencia se determina automáticamente según la edad del titular.
         boolean esPrimeraVez = repository.findByNumeroDocumento(dto.getNumeroDocumento()).isEmpty();

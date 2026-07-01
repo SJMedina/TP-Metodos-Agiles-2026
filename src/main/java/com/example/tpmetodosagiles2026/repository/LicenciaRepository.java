@@ -14,6 +14,8 @@ public interface LicenciaRepository extends JpaRepository<Licencia, Long> {
 
     Optional<Licencia> findByNumeroDocumentoAndClaseAndVigenteTrue(String numeroDocumento, String clase);
 
+    List<Licencia> findByNumeroDocumentoAndVigenteTrue(String numeroDocumento);
+
     List<Licencia> findByVigenteTrue();
 
     List<Licencia> findByVigenteFalse();

@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -13,10 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -24,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.example.tpmetodosagiles2026.dto.EmitirLicenciaDTO;
 import com.example.tpmetodosagiles2026.model.Licencia;
 import com.example.tpmetodosagiles2026.repository.LicenciaRepository;
+import com.example.tpmetodosagiles2026.repository.TitularRepository;
 
 @ExtendWith(MockitoExtension.class)
 class LicenciaServiceVigenteUnicaTest {
@@ -33,6 +31,9 @@ class LicenciaServiceVigenteUnicaTest {
 
     @Mock
     private LicenciaCostoService costoService;
+
+    @Mock
+    private TitularRepository titularRepository;
 
     @InjectMocks
     private LicenciaService service;
@@ -58,8 +59,9 @@ class LicenciaServiceVigenteUnicaTest {
         anterior.setFechaEmision(LocalDateTime.now().minusYears(2));
         anterior.setVigencia(5);
 
-        when(repository.findByNumeroDocumentoAndClaseAndVigenteTrue("12345678", "B"))
-                .thenReturn(Optional.of(anterior));
+        when(titularRepository.existsByNumeroDocumento("12345678")).thenReturn(true);
+        when(repository.findByNumeroDocumentoAndVigenteTrue("12345678"))
+                .thenReturn(List.of(anterior));
         when(repository.findByNumeroDocumento("12345678")).thenReturn(List.of(anterior));
         when(costoService.calcularCostoTotal(anyString(), anyInt())).thenReturn(40.0);
         when(repository.save(any(Licencia.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -75,8 +77,9 @@ class LicenciaServiceVigenteUnicaTest {
 
     @Test
     void emitir_sinVigentePrevia_noArchivaNada() {
-        when(repository.findByNumeroDocumentoAndClaseAndVigenteTrue("12345678", "B"))
-                .thenReturn(Optional.empty());
+        when(titularRepository.existsByNumeroDocumento("12345678")).thenReturn(true);
+        when(repository.findByNumeroDocumentoAndVigenteTrue("12345678"))
+                .thenReturn(List.of());
         when(repository.findByNumeroDocumento("12345678")).thenReturn(List.of());
         when(costoService.calcularCostoTotal(anyString(), anyInt())).thenReturn(40.0);
         when(repository.save(any(Licencia.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -87,17 +90,26 @@ class LicenciaServiceVigenteUnicaTest {
     }
 
     @Test
-    void emitir_otraClase_noTocaLaVigenteDeClaseDistinta() {
-        // Existe vigente clase B; se emite clase A -> no se archiva la B.
-        when(repository.findByNumeroDocumentoAndClaseAndVigenteTrue("12345678", "A"))
-                .thenReturn(Optional.empty());
-        when(repository.findByNumeroDocumento("12345678")).thenReturn(List.of(new Licencia()));
+    void emitir_conVigenteDeOtraClase_archivaLaAnterior() {
+        // Una sola licencia vigente por persona: existe vigente clase B; al emitir clase A
+        // (p. ej. tras modificar el titular) la B debe quedar archivada.
+        Licencia anteriorB = new Licencia();
+        anteriorB.setId(99L);
+        anteriorB.setNumeroDocumento("12345678");
+        anteriorB.setClase("B");
+        anteriorB.setVigente(true);
+
+        when(titularRepository.existsByNumeroDocumento("12345678")).thenReturn(true);
+        when(repository.findByNumeroDocumentoAndVigenteTrue("12345678"))
+                .thenReturn(List.of(anteriorB));
+        when(repository.findByNumeroDocumento("12345678")).thenReturn(List.of(anteriorB));
         when(costoService.calcularCostoTotal(anyString(), anyInt())).thenReturn(40.0);
         when(repository.save(any(Licencia.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        service.emitir(dtoClase("A"));
+        Licencia nueva = service.emitir(dtoClase("A"));
 
-        // Nunca se consultó por la clase B al emitir una clase A.
-        verify(repository, never()).findByNumeroDocumentoAndClaseAndVigenteTrue(eq("12345678"), eq("B"));
+        assertFalse(anteriorB.getVigente(), "La licencia previa de otra clase debe quedar archivada");
+        assertTrue(nueva.getVigente(), "La nueva licencia debe quedar vigente");
+        verify(repository).save(anteriorB);
     }
 }

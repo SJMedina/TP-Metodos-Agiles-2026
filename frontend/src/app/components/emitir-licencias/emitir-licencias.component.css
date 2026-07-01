@@ -203,6 +203,48 @@
   color: #14532d;
 }
 
+/* Buscador de titulares con sugerencias */
+.titular-buscador {
+  position: relative;
+}
+
+.titular-sugerencias {
+  list-style: none;
+  margin: -12px 0 16px;
+  padding: 4px;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  background: #ffffff;
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 20;
+}
+
+.titular-sugerencias li {
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #0f172a;
+}
+
+.titular-sugerencias li:hover {
+  background: #f0fdf4;
+}
+
+.titular-sugerencias li.sin-resultados {
+  cursor: default;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.titular-sugerencias li.sin-resultados:hover {
+  background: transparent;
+}
+
 /* Info vigencia */
 .vigencia-info {
   background: #f0fdf4;

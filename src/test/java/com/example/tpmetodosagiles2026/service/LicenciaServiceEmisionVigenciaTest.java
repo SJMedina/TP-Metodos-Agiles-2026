@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.example.tpmetodosagiles2026.dto.EmitirLicenciaDTO;
 import com.example.tpmetodosagiles2026.model.Licencia;
 import com.example.tpmetodosagiles2026.repository.LicenciaRepository;
+import com.example.tpmetodosagiles2026.repository.TitularRepository;
 
 @ExtendWith(MockitoExtension.class)
 class LicenciaServiceEmisionVigenciaTest {
@@ -30,6 +31,9 @@ class LicenciaServiceEmisionVigenciaTest {
 
     @Mock
     private LicenciaCostoService costoService;
+
+    @Mock
+    private TitularRepository titularRepository;
 
     @InjectMocks
     private LicenciaService service;
@@ -55,6 +59,7 @@ class LicenciaServiceEmisionVigenciaTest {
     }
 
     private void stubGuardado() {
+        when(titularRepository.existsByNumeroDocumento("12345678")).thenReturn(true);
         when(costoService.calcularCostoTotal(anyString(), anyInt())).thenReturn(40.0);
         when(repository.save(any(Licencia.class))).thenAnswer(inv -> inv.getArgument(0));
     }
