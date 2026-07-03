@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class LicenciaCostoService {
 
-    private static final double GASTO_ADMINISTRATIVO = 8.0;
+    public static final double GASTO_ADMINISTRATIVO = 8.0;
 
     public double calcularCostoTotal(String clase, int vigenciaAnios) {
         double costoBase = obtenerCostoBase(clase.toUpperCase(), vigenciaAnios);
